@@ -1,0 +1,21 @@
+{
+  "name": "Barebones Agent Clean Room",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "remoteUser": "node",
+  "userEnvProbe": "none",
+  "runArgs": [
+    "--tmpfs",
+    "/home/node/.ssh:uid=1000,gid=1000,mode=0700"
+  ],
+  "mounts": [],
+  "postCreateCommand": "find /home/node/.ssh -mindepth 1 -maxdepth 1 -exec rm -rf {} + && chmod 700 /home/node/.ssh",
+  "containerEnv": {
+    "DISABLE_AUTOUPDATER": "1",
+    "NODE_PATH": "/usr/local/share/npm-global/lib/node_modules",
+    "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright"
+  }
+}

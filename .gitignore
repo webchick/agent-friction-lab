@@ -1,0 +1,10 @@
+.DS_Store
+.playwright-mcp/
+environment.md
+raw-log.md
+evidence-index.md
+findings.md
+final-report.md
+evidence/
+artifacts/
+runs/
