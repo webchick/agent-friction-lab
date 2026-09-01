@@ -1,5 +1,5 @@
 {
-  "name": "Barebones Agent Clean Room",
+  "name": "Agent Airlock",
   "build": {
     "dockerfile": "Dockerfile"
   },
@@ -12,7 +12,7 @@
     "/home/node/.ssh:uid=1000,gid=1000,mode=0700"
   ],
   "mounts": [],
-  "postCreateCommand": "find /home/node/.ssh -mindepth 1 -maxdepth 1 -exec rm -rf {} + && chmod 700 /home/node/.ssh",
+  "postCreateCommand": ".airlock/setup-airlock.sh",
   "containerEnv": {
     "DISABLE_AUTOUPDATER": "1",
     "NODE_PATH": "/usr/local/share/npm-global/lib/node_modules",

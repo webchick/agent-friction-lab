@@ -1,0 +1,18 @@
+{
+  "requiredCommands": [
+    "node",
+    "npm",
+    "git",
+    "curl",
+    "jq",
+    "claude"
+  ],
+  "forbiddenCommands": [],
+  "forbiddenEnvPattern": "",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
+  "allowedMcpServers": [],
+  "npmGlobalPackages": [],
+  "playwrightBrowsers": [],
+  "playwrightMcpBrowsers": [],
+  "mcpServers": []
+}

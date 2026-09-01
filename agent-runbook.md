@@ -17,6 +17,8 @@ The environment should begin with:
 - browser automation available from the beginning,
 - generic shell, git, package manager, curl, jq, and web access available.
 
+The exact allowed MCP servers, extra required commands, forbidden commands, forbidden environment patterns, and prior-run trace patterns are declared in `.airlock/config.json`.
+
 The model's stock training knowledge is allowed and is part of the real-world test. Treat this as a cold-context and cold-environment test, not a literal test of zero prior model knowledge.
 
 Before touching the target task, create `environment.md` containing literal outputs of checks for at least:

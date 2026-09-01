@@ -14,16 +14,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Claude Code, Playwright, and the Playwright MCP server are installed in the
-# image so they are present immediately after container creation.
-RUN npm install -g @anthropic-ai/claude-code playwright @playwright/mcp
-
-# Install Chromium + the Linux libraries Playwright needs into a shared cache.
-RUN npx --no-install playwright install --with-deps chromium \
-    && playwright-mcp install-browser chrome-for-testing \
-    && chmod -R a+rX /ms-playwright
+# Claude Code is part of the baseline. Experiment-specific packages and MCP
+# exposure are controlled by .airlock/config.json during post-create setup.
+RUN npm install -g @anthropic-ai/claude-code
 
 USER node
-
-# Configure only a container-local Claude MCP entry, available from any project.
-RUN claude mcp add --scope user playwright -- playwright-mcp --isolated --headless --browser chromium --no-sandbox --output-dir /tmp/playwright-mcp

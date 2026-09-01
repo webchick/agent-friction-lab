@@ -3,10 +3,24 @@ set -Eeuo pipefail
 
 failures=0
 
-allowed_mcp_servers="${AIRLOCK_ALLOWED_MCP_SERVERS:-playwright}"
-forbidden_commands="${AIRLOCK_FORBIDDEN_COMMANDS:-}"
-forbidden_env_pattern="${AIRLOCK_FORBIDDEN_ENV_PATTERN:-}"
-prior_trace_pattern="${AIRLOCK_PRIOR_TRACE_PATTERN:-(^|/)(environment|evidence-index|raw-log|findings)\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\.playwright-mcp(/|$)}"
+config_path="${AIRLOCK_CONFIG:-.airlock/config.json}"
+
+if [ ! -f "$config_path" ]; then
+  printf 'FAIL: airlock config not found: %s\n' "$config_path" >&2
+  exit 1
+fi
+
+read_json_array_words() {
+  local query="$1"
+  jq -r "$query | join(\" \")" "$config_path"
+}
+
+required_commands="${AIRLOCK_REQUIRED_COMMANDS:-$(read_json_array_words '.requiredCommands // []')}"
+configured_mcp_required_commands="$(jq -r '.mcpServers[]?.requiredCommands[]?' "$config_path" | sort -u | tr '\n' ' ')"
+allowed_mcp_servers="${AIRLOCK_ALLOWED_MCP_SERVERS:-$(read_json_array_words '.allowedMcpServers // []')}"
+forbidden_commands="${AIRLOCK_FORBIDDEN_COMMANDS:-$(read_json_array_words '.forbiddenCommands // []')}"
+forbidden_env_pattern="${AIRLOCK_FORBIDDEN_ENV_PATTERN:-$(jq -r '.forbiddenEnvPattern // ""' "$config_path")}"
+prior_trace_pattern="${AIRLOCK_PRIOR_TRACE_PATTERN:-$(jq -r '.priorTracePattern // ""' "$config_path")}"
 
 pass() {
   printf 'PASS: %s\n' "$1"
@@ -62,6 +76,7 @@ printf 'Date: %s\n' "$(date -Is)"
 printf 'OS: %s\n' "$(uname -a)"
 printf 'CWD: %s\n' "$PWD"
 printf 'HOME: %s\n' "$HOME"
+printf 'Config: %s\n' "$config_path"
 printf '\n'
 
 if [ -r /etc/debian_version ]; then
@@ -75,7 +90,7 @@ case "$(uname -s)" in
   *) fail "expected Linux kernel, found $(uname -s)" ;;
 esac
 
-for tool in node npm git curl jq claude playwright playwright-mcp; do
+for tool in $required_commands $configured_mcp_required_commands; do
   require_command "$tool"
 done
 
@@ -184,11 +199,13 @@ fi
 if [ -f "$HOME/.claude.json" ] || [ -d "$HOME/.claude" ]; then
   claude_mcp_list="$(claude mcp list 2>&1 || true)"
   printf 'Claude MCP list:\n%s\n\n' "$claude_mcp_list"
-  if printf '%s\n' "$claude_mcp_list" | grep -Eq '^playwright:'; then
-    pass "Claude Code has a playwright MCP server configured"
-  else
-    fail "Claude Code does not list the playwright MCP server"
-  fi
+  for expected_name in $allowed_mcp_servers; do
+    if printf '%s\n' "$claude_mcp_list" | grep -Eq "^${expected_name}:"; then
+      pass "Claude Code has expected MCP server configured: $expected_name"
+    else
+      fail "Claude Code does not list expected MCP server: $expected_name"
+    fi
+  done
   mcp_names="$(printf '%s\n' "$claude_mcp_list" | sed -nE 's/^([[:alnum:]_.@/-]+):.*/\1/p' | sort -u)"
   unexpected_mcp=""
   for name in $mcp_names; do
@@ -204,10 +221,15 @@ if [ -f "$HOME/.claude.json" ] || [ -d "$HOME/.claude" ]; then
     pass "Claude Code lists only allowed MCP/connectors: $allowed_mcp_servers"
   fi
 else
-  fail "Claude Code configuration is absent; expected container-local playwright MCP config"
+  if [ -n "$allowed_mcp_servers" ]; then
+    fail "Claude Code configuration is absent; expected container-local MCP config"
+  else
+    pass "Claude Code configuration is absent and no MCP servers are expected"
+  fi
 fi
 
-if NODE_PATH="${NODE_PATH:-/usr/local/share/npm-global/lib/node_modules}" node <<'NODE'
+if jq -e '.mcpServers[]? | select(.smokeTest == "example.com-accessibility-snapshot")' "$config_path" >/dev/null; then
+  if NODE_PATH="${NODE_PATH:-/usr/local/share/npm-global/lib/node_modules}" node <<'NODE'
 const { chromium } = require('playwright');
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
@@ -226,13 +248,13 @@ const { chromium } = require('playwright');
   process.exit(1);
 });
 NODE
-then
-  pass "headless Chromium opened example.com and returned an accessibility snapshot"
-else
-  fail "headless Chromium example.com accessibility smoke test failed"
-fi
+  then
+    pass "headless Chromium opened example.com and returned an accessibility snapshot"
+  else
+    fail "headless Chromium example.com accessibility smoke test failed"
+  fi
 
-if node <<'NODE'
+  if node <<'NODE'
 const { spawn } = require('node:child_process');
 const child = spawn('playwright-mcp', ['--isolated', '--headless', '--browser', 'chromium', '--no-sandbox', '--output-dir', '/tmp/playwright-mcp'], {
   stdio: ['pipe', 'pipe', 'pipe'],
@@ -315,10 +337,13 @@ send('initialize', {
   clientInfo: { name: 'verify-airlock', version: '1.0.0' },
 });
 NODE
-then
-  pass "Playwright MCP launched, navigated to example.com, and produced a snapshot"
+  then
+    pass "Playwright MCP launched, navigated to example.com, and produced a snapshot"
+  else
+    fail "Playwright MCP functional smoke test failed"
+  fi
 else
-  fail "Playwright MCP functional smoke test failed"
+  pass "no browser MCP smoke test configured"
 fi
 
 if [ "$failures" -eq 0 ]; then

@@ -64,9 +64,25 @@ Examples:
 
 ## Preflight Additions
 
-Set experiment-specific airlock checks here.
+Set experiment-specific airlock checks here. Prefer editing `.airlock/config.json` so setup and verification use the same source of truth.
 
-Suggested shell form:
+Suggested config fields:
+
+```json
+{
+  "requiredCommands": ["node", "npm", "git", "curl", "jq", "claude"],
+  "forbiddenCommands": [],
+  "forbiddenEnvPattern": "",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)",
+  "allowedMcpServers": ["playwright"],
+  "npmGlobalPackages": [],
+  "playwrightBrowsers": [],
+  "playwrightMcpBrowsers": [],
+  "mcpServers": []
+}
+```
+
+Optional one-off shell overrides:
 
 ```bash
 export AIRLOCK_FORBIDDEN_COMMANDS=""

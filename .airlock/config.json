@@ -1,0 +1,46 @@
+{
+  "requiredCommands": [
+    "node",
+    "npm",
+    "git",
+    "curl",
+    "jq",
+    "claude"
+  ],
+  "forbiddenCommands": [],
+  "forbiddenEnvPattern": "",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
+  "allowedMcpServers": [
+    "playwright"
+  ],
+  "npmGlobalPackages": [
+    "playwright",
+    "@playwright/mcp"
+  ],
+  "playwrightBrowsers": [
+    "chromium"
+  ],
+  "playwrightMcpBrowsers": [
+    "chrome-for-testing"
+  ],
+  "mcpServers": [
+    {
+      "name": "playwright",
+      "command": "playwright-mcp",
+      "args": [
+        "--isolated",
+        "--headless",
+        "--browser",
+        "chromium",
+        "--no-sandbox",
+        "--output-dir",
+        "/tmp/playwright-mcp"
+      ],
+      "requiredCommands": [
+        "playwright",
+        "playwright-mcp"
+      ],
+      "smokeTest": "example.com-accessibility-snapshot"
+    }
+  ]
+}

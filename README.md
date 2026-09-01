@@ -8,16 +8,19 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 - Debian Linux + Node.js
 - Claude Code
-- Playwright MCP configured at container creation
-- Headless Chromium verified both directly and through Playwright MCP
+- Config-selected MCP servers applied at container creation
+- Optional Playwright MCP and headless Chromium smoke test for browser-based experiments
 - Generic developer tools: `git`, `curl`, `jq`, `npm`
 - No host home mount, host SSH keys, host Claude config, platform credentials, or platform-specific MCPs/skills
+- Experiment-specific MCP servers and checks declared in `.airlock/config.json`
 - A verifier script that fails loudly when the airlock assumptions are violated
 - A reset script that moves run artifacts out of the active workspace
 - A reusable experiment runbook for evidence, logs, findings, and RETURN behavior
 
 ## Files
 
+- `.airlock/config.json` - experiment-specific tools, MCPs, and verifier settings
+- `.airlock/setup-airlock.sh` - applies MCP configuration inside the container
 - `.devcontainer/` - disposable airlock container definition
 - `verify-airlock.sh` - automated preflight verification
 - `reset-airlock-workspace.sh` - archive/remove run artifacts from the active workspace
@@ -36,7 +39,30 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 ## Optional Verification Settings
 
-The verifier is intentionally generic. For a particular experiment, you can add stricter checks through environment variables:
+The verifier is intentionally generic. For a particular experiment, edit `.airlock/config.json`:
+
+```json
+{
+  "requiredCommands": ["node", "npm", "git", "curl", "jq", "claude"],
+  "forbiddenCommands": ["example-cli"],
+  "forbiddenEnvPattern": "EXAMPLE_VENDOR|ANOTHER_VENDOR",
+  "allowedMcpServers": ["playwright"],
+  "npmGlobalPackages": ["playwright", "@playwright/mcp"],
+  "playwrightBrowsers": ["chromium"],
+  "playwrightMcpBrowsers": ["chrome-for-testing"],
+  "mcpServers": [
+    {
+      "name": "playwright",
+      "command": "playwright-mcp",
+      "args": ["--isolated", "--headless", "--browser", "chromium", "--no-sandbox"],
+      "requiredCommands": ["playwright", "playwright-mcp"],
+      "smokeTest": "example.com-accessibility-snapshot"
+    }
+  ]
+}
+```
+
+Environment variables can override config values for one-off runs:
 
 ```bash
 AIRLOCK_FORBIDDEN_COMMANDS="example-cli another-cli" ./verify-airlock.sh
@@ -44,7 +70,9 @@ AIRLOCK_FORBIDDEN_ENV_PATTERN="EXAMPLE_VENDOR|ANOTHER_VENDOR" ./verify-airlock.s
 AIRLOCK_ALLOWED_MCP_SERVERS="playwright" ./verify-airlock.sh
 ```
 
-By default, the only allowed Claude MCP server is `playwright`.
+The sample config enables Playwright MCP because browser automation is a common experiment need. Remove it from `npmGlobalPackages`, `playwrightBrowsers`, `playwrightMcpBrowsers`, `mcpServers`, and `allowedMcpServers` for a shell-only airlock.
+
+A shell-only example is available at `.airlock/config.shell-only.example.json`.
 
 ## Resetting Between Runs
 

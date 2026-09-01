@@ -7,6 +7,7 @@ archive_dir="$archive_root/$timestamp"
 
 baseline_paths=(
   ".devcontainer"
+  ".airlock"
   "README.md"
   "agent-runbook.md"
   "experiment-brief.md"
@@ -35,6 +36,7 @@ Moves known experiment/preflight artifacts out of this workspace and into:
 
 The baseline harness files are left in place:
   .devcontainer/
+  .airlock/
   README.md
   agent-runbook.md
   experiment-brief.md
