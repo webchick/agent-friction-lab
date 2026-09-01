@@ -1,6 +1,6 @@
-# Clean-Room Experiment Brief
+# Airlock Experiment Brief
 
-Fill this file in for a specific clean-room agent experiment.
+Fill this file in for a specific airlock agent experiment.
 
 ## Reason
 
@@ -64,16 +64,16 @@ Examples:
 
 ## Preflight Additions
 
-Set experiment-specific clean-room checks here.
+Set experiment-specific airlock checks here.
 
 Suggested shell form:
 
 ```bash
-export CLEANROOM_FORBIDDEN_COMMANDS=""
-export CLEANROOM_FORBIDDEN_ENV_PATTERN=""
-export CLEANROOM_PRIOR_TRACE_PATTERN=""
-export CLEANROOM_ALLOWED_MCP_SERVERS="playwright"
-./verify-cleanroom.sh
+export AIRLOCK_FORBIDDEN_COMMANDS=""
+export AIRLOCK_FORBIDDEN_ENV_PATTERN=""
+export AIRLOCK_PRIOR_TRACE_PATTERN=""
+export AIRLOCK_ALLOWED_MCP_SERVERS="playwright"
+./verify-airlock.sh
 ```
 
 ## Tests

@@ -1,10 +1,10 @@
-# Clean-Room Agent Experiment Runbook
+# Airlock Agent Experiment Runbook
 
 Use this runbook with a task-specific brief. Do not begin the task until preflight passes.
 
 ## Preflight
 
-Before starting task work, verify and record that the environment matches the intended clean-room conditions.
+Before starting task work, verify and record that the environment matches the intended airlock conditions.
 
 The environment should begin with:
 
@@ -31,9 +31,9 @@ Before touching the target task, create `environment.md` containing literal outp
 - configured MCP servers/plugins/skills,
 - a harmless Playwright/browser smoke test proving browser automation works before task work starts.
 
-Run `./verify-cleanroom.sh` and record its output as evidence.
+Run `./verify-airlock.sh` and record its output as evidence.
 
-If the environment is not clean in a way that could materially affect comparability, stop and RETURN before proceeding.
+If the environment is not airlocked in a way that could materially affect comparability, stop and RETURN before proceeding.
 
 For minor ambiguities that do not materially affect the experiment, make a reasonable decision yourself and record the assumption.
 
@@ -99,7 +99,7 @@ Do not invent a post-hoc rationale if the contemporaneous record does not contai
 
 ## Task Execution
 
-Starting from the verified clean environment:
+Starting from the verified airlock environment:
 
 1. Determine independently how to accomplish the task using only stock model knowledge plus information/resources discovered during the run.
 2. Attempt the task.

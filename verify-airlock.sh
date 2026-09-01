@@ -3,10 +3,10 @@ set -Eeuo pipefail
 
 failures=0
 
-allowed_mcp_servers="${CLEANROOM_ALLOWED_MCP_SERVERS:-playwright}"
-forbidden_commands="${CLEANROOM_FORBIDDEN_COMMANDS:-}"
-forbidden_env_pattern="${CLEANROOM_FORBIDDEN_ENV_PATTERN:-}"
-prior_trace_pattern="${CLEANROOM_PRIOR_TRACE_PATTERN:-(^|/)(environment|evidence-index|raw-log|findings)\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\.playwright-mcp(/|$)}"
+allowed_mcp_servers="${AIRLOCK_ALLOWED_MCP_SERVERS:-playwright}"
+forbidden_commands="${AIRLOCK_FORBIDDEN_COMMANDS:-}"
+forbidden_env_pattern="${AIRLOCK_FORBIDDEN_ENV_PATTERN:-}"
+prior_trace_pattern="${AIRLOCK_PRIOR_TRACE_PATTERN:-(^|/)(environment|evidence-index|raw-log|findings)\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\.playwright-mcp(/|$)}"
 
 pass() {
   printf 'PASS: %s\n' "$1"
@@ -57,7 +57,7 @@ check_no_sensitive_env() {
   fi
 }
 
-printf '== Clean-room verification ==\n'
+printf '== Airlock verification ==\n'
 printf 'Date: %s\n' "$(date -Is)"
 printf 'OS: %s\n' "$(uname -a)"
 printf 'CWD: %s\n' "$PWD"
@@ -129,7 +129,7 @@ else
 fi
 
 if [ -f "$HOME/.ssh/known_hosts" ]; then
-  fail "\$HOME/.ssh/known_hosts exists; clean-room SSH host history must be empty"
+  fail "\$HOME/.ssh/known_hosts exists; airlock SSH host history must be empty"
 fi
 
 if [ "${HOME#"/Users/"}" != "$HOME" ] || [ "${HOME#"/home/"}" = "$HOME" ]; then
@@ -170,7 +170,7 @@ workspace_files="$(find "$PWD" -maxdepth 2 -mindepth 1 -not -path '*/.git/*' -pr
 printf 'Workspace files visible:\n%s\n\n' "${workspace_files:-"(none)"}"
 
 if [ -n "$prior_trace_pattern" ] && printf '%s\n' "$workspace_files" | grep -Eiq "$prior_trace_pattern"; then
-  fail "workspace appears to contain platform experiment traces or platform-specific files"
+  fail "workspace appears to contain configured prior-run traces"
 else
   pass "workspace contains no configured prior-run traces"
 fi
@@ -198,7 +198,7 @@ if [ -f "$HOME/.claude.json" ] || [ -d "$HOME/.claude" ]; then
     esac
   done
   if [ -n "$unexpected_mcp" ]; then
-    fail "Claude Code lists MCP/connectors outside CLEANROOM_ALLOWED_MCP_SERVERS"
+    fail "Claude Code lists MCP/connectors outside AIRLOCK_ALLOWED_MCP_SERVERS"
     printf '%s' "$unexpected_mcp" >&2
   else
     pass "Claude Code lists only allowed MCP/connectors: $allowed_mcp_servers"
@@ -312,7 +312,7 @@ child.stdout.on('data', chunk => {
 send('initialize', {
   protocolVersion: '2024-11-05',
   capabilities: {},
-  clientInfo: { name: 'verify-cleanroom', version: '1.0.0' },
+  clientInfo: { name: 'verify-airlock', version: '1.0.0' },
 });
 NODE
 then
@@ -322,8 +322,8 @@ else
 fi
 
 if [ "$failures" -eq 0 ]; then
-  printf '\nAll clean-room checks passed.\n'
+  printf '\nAll airlock checks passed.\n'
 else
-  printf '\n%d clean-room check(s) failed.\n' "$failures" >&2
+  printf '\n%d airlock check(s) failed.\n' "$failures" >&2
   exit 1
 fi
