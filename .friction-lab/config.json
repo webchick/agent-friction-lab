@@ -17,15 +17,11 @@
     }
   ],
   "reviewProtocol": {
-    "mode": "single-agent",
     "description": "One configured agent executes the experiment and records evidence."
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
   "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
-  "allowedMcpServers": [
-    "playwright"
-  ],
   "npmGlobalPackages": [
     "@anthropic-ai/claude-code",
     "playwright",

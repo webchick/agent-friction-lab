@@ -87,13 +87,11 @@ Suggested config fields:
     }
   ],
   "reviewProtocol": {
-    "mode": "single-agent",
     "description": "One configured agent executes the experiment and records evidence."
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
   "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)",
-  "allowedMcpServers": ["playwright"],
   "npmGlobalPackages": [],
   "playwrightBrowsers": [],
   "playwrightMcpBrowsers": [],

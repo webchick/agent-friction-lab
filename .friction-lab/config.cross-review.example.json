@@ -33,9 +33,7 @@
     }
   ],
   "reviewProtocol": {
-    "mode": "cross-review",
     "description": "The executor produces evidence and findings. The reviewer independently examines the same evidence and produces its own findings. The mediator reconciles the two into a cited final report, surfacing disagreements rather than resolving them, before escalating to the human.",
-    "stages": ["executor", "reviewer", "mediator"],
     "handoffArtifacts": [
       "environment.md",
       "raw-log.md",
@@ -55,9 +53,6 @@
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
   "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
-  "allowedMcpServers": [
-    "playwright"
-  ],
   "npmGlobalPackages": [
     "@anthropic-ai/claude-code",
     "playwright",

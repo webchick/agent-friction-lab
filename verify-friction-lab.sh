@@ -30,7 +30,7 @@ read_json_array_words() {
 
 required_commands="${FRICTION_LAB_REQUIRED_COMMANDS:-$(read_json_array_words '.requiredCommands // []')}"
 configured_mcp_required_commands="$(jq -r '.mcpServers[]?.requiredCommands[]?' "$config_path" | sort -u | tr '\n' ' ')"
-allowed_mcp_servers="${FRICTION_LAB_ALLOWED_MCP_SERVERS:-$(read_json_array_words '.allowedMcpServers // []')}"
+allowed_mcp_servers="${FRICTION_LAB_ALLOWED_MCP_SERVERS:-$(read_json_array_words '[.mcpServers[]?.name] // []')}"
 forbidden_commands="${FRICTION_LAB_FORBIDDEN_COMMANDS:-$(read_json_array_words '.forbiddenCommands // []')}"
 forbidden_env_pattern="${FRICTION_LAB_FORBIDDEN_ENV_PATTERN:-$(jq -r '.forbiddenEnvPattern // ""' "$config_path")}"
 prior_trace_pattern="${FRICTION_LAB_PRIOR_TRACE_PATTERN:-$(jq -r '.priorTracePattern // ""' "$config_path")}"
@@ -278,7 +278,7 @@ if [ "$mcp_provider" = "claude" ]; then
   fi
 else
   if [ -n "$allowed_mcp_servers" ]; then
-    fail "allowedMcpServers is set, but no compatible agent MCP provider is configured (provider=$mcp_provider)"
+    fail "mcpServers are configured, but no compatible agent MCP provider is configured (provider=$mcp_provider)"
   else
     pass "no MCP provider configured"
   fi

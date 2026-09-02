@@ -8,13 +8,11 @@
   ],
   "agents": [],
   "reviewProtocol": {
-    "mode": "none",
     "description": "No agent command or MCP provider is configured."
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
   "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
-  "allowedMcpServers": [],
   "npmGlobalPackages": [],
   "playwrightBrowsers": [],
   "playwrightMcpBrowsers": [],

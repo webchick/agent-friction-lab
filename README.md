@@ -136,12 +136,10 @@ The verifier is intentionally generic. For each experiment, edit `.friction-lab/
     }
   ],
   "reviewProtocol": {
-    "mode": "single-agent",
     "description": "One configured agent executes the experiment and records evidence."
   },
   "forbiddenCommands": ["example-cli"],
   "forbiddenEnvPattern": "EXAMPLE_VENDOR|ANOTHER_VENDOR",
-  "allowedMcpServers": ["playwright"],
   "npmGlobalPackages": ["@anthropic-ai/claude-code", "playwright", "@playwright/mcp"],
   "playwrightBrowsers": ["chromium"],
   "playwrightMcpBrowsers": ["chrome-for-testing"],
@@ -166,9 +164,11 @@ FRICTION_LAB_FORBIDDEN_ENV_PATTERN="EXAMPLE_VENDOR|ANOTHER_VENDOR"
 FRICTION_LAB_ALLOWED_MCP_SERVERS="playwright"
 ```
 
+The expected-MCP-server list the verifier checks against is derived from `mcpServers[].name` in the resolved config, so it can't drift out of sync with what's actually declared; `FRICTION_LAB_ALLOWED_MCP_SERVERS` only needs setting to override that derived list for an unusual case (for example, an MCP server that's expected to already be configured outside this repo's `mcpServers[]`).
+
 `.friction-lab/env` and `.friction-lab/config.local.json` are ignored by Git so local experiment details do not accidentally get committed to the public harness repo.
 
-The default config enables Claude Code plus Playwright MCP because browser automation is a common experiment need. Remove or replace the agents, package, browser, MCP, and allowed-server entries for a different agent or a shell-only friction lab.
+The default config enables Claude Code plus Playwright MCP because browser automation is a common experiment need. Remove or replace the agents, package, browser, and MCP entries for a different agent or a shell-only friction lab.
 
 Examples are available at `.friction-lab/config.claude-playwright.example.json`, `.friction-lab/config.cross-review.example.json`, and `.friction-lab/config.shell-only.example.json`.
 
