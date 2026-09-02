@@ -173,6 +173,14 @@ else
 fi
 check_no_sensitive_env
 
+if [ "$mcp_provider" = "claude" ]; then
+  if [ "${ENABLE_CLAUDEAI_MCP_SERVERS:-}" = "false" ]; then
+    pass "ENABLE_CLAUDEAI_MCP_SERVERS=false (first-party connectors disabled for the Claude Code agent)"
+  else
+    fail "ENABLE_CLAUDEAI_MCP_SERVERS is not set to false; first-party connectors (Gmail, Calendar, Drive, etc.) tied to the authenticated account may load for the Claude Code agent"
+  fi
+fi
+
 if [ -d "$HOME/.ssh" ]; then
   if [ ! -r "$HOME/.ssh" ] || [ ! -w "$HOME/.ssh" ]; then
     fail "\$HOME/.ssh exists but is not readable and writable by $(id -un)"

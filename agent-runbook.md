@@ -11,11 +11,13 @@ The environment should begin with:
 - no pre-authenticated target accounts,
 - no target-specific CLIs or SDKs unless explicitly part of the baseline being tested,
 - no saved browser sessions,
-- no target-specific MCP servers, plugins, agent skills, or injected product documentation,
+- no target-specific MCP servers, connectors, plugins, agent skills, or injected product documentation,
 - no prior experiment traces or findings visible in the active workspace,
 - no host SSH keys or target credentials,
 - browser automation available from the beginning,
 - generic shell, git, package manager, curl, jq, and web access available.
+
+Connectors (Gmail, Google Calendar, Google Drive, and similar first-party integrations) are tied to the authenticated account, not to container/filesystem state — rebuilding the container does not remove them if the agent authenticates as the same account each time. The devcontainer sets `ENABLE_CLAUDEAI_MCP_SERVERS=false` to prevent them from loading at all for a Claude Code executor, but check for them explicitly anyway (`claude mcp list` or the equivalent for the configured agent), not just for locally-configured MCP servers — this is a real environment defect, not a hypothetical one, found during this harness's own validation, and the check should not depend solely on that one setting continuing to be present and effective. Account-level access to a real inbox or drive can materially change how much real-world friction a task actually has (e.g. reading a signup verification email directly instead of experiencing that step as friction).
 
 The exact allowed MCP servers, extra required commands, forbidden commands, forbidden environment patterns, and prior-run trace patterns are declared in `.friction-lab/config.json`.
 
@@ -30,7 +32,7 @@ Before touching the target task, create `environment.md` containing literal outp
 - relevant target/vendor environment variables,
 - contents of `~/.ssh` if present,
 - files visible in the workspace,
-- configured MCP servers/plugins/skills,
+- configured MCP servers/connectors/plugins/skills,
 - a harmless Playwright/browser smoke test proving browser automation works before task work starts.
 
 Run `./verify-friction-lab.sh` and record its output as evidence.

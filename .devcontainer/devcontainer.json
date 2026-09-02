@@ -16,6 +16,7 @@
   "containerEnv": {
     "DISABLE_AUTOUPDATER": "1",
     "NODE_PATH": "/usr/local/share/npm-global/lib/node_modules",
-    "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright"
+    "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
   }
 }

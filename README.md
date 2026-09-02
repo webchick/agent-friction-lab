@@ -77,6 +77,7 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - Optional Playwright MCP and headless Chromium smoke test for browser-based experiments
 - Generic developer tools: `git`, `curl`, `jq`, `npm`
 - No host home mount, host SSH keys, host Claude config, platform credentials, or platform-specific MCPs/skills
+- First-party connectors (Gmail, Google Calendar, Google Drive, and similar) disabled by default for the Claude Code executor via `ENABLE_CLAUDEAI_MCP_SERVERS=false`, since they're tied to the authenticated account rather than container state and survive a container rebuild otherwise
 - Experiment-specific MCP servers and checks declared in ignored local config
 - A verifier script that fails loudly when the friction lab assumptions are violated
 - A reset script that moves run artifacts out of the active workspace
