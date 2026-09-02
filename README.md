@@ -4,6 +4,29 @@ Reusable Dev Container harness for friction lab agent-readiness experiments.
 
 Use this when you want to observe what happens when a relatively barebones coding agent tries to accomplish a task from a cold workspace and a generic developer environment.
 
+## Quickstart
+
+```bash
+git clone https://github.com/webchick/agent-friction-lab.git
+cd agent-friction-lab
+cp .friction-lab/config.json .friction-lab/config.local.json
+```
+
+Edit `experiment-brief.md` and `.friction-lab/config.local.json` for your test.
+
+Then restart the disposable test environment:
+
+- In VS Code: run **Dev Containers: Rebuild and Reopen in Container** from the command palette.
+- In a terminal: run `devcontainer up --workspace-folder . --remove-existing-container`.
+
+Inside the container:
+
+```bash
+./verify-friction-lab.sh
+```
+
+Start the agent experiment only after verification passes.
+
 ## What It Provides
 
 - Debian Linux + Node.js
