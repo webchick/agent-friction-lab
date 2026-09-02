@@ -34,7 +34,7 @@ Use this when you want to observe what happens when a relatively barebones codin
 1. Copy or clone this harness into a new experiment workspace.
 2. Edit `experiment-brief.md` with the concrete task/outcome.
 3. Copy `.friction-lab/config.json` to `.friction-lab/config.local.json` and edit the local file for the experiment.
-4. Rebuild/reopen the Dev Container.
+4. Restart the disposable Dev Container so the local config is applied.
 5. Run `./verify-friction-lab.sh`.
 6. Start the agent experiment only after the verifier passes.
 7. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
@@ -43,6 +43,14 @@ Use this when you want to observe what happens when a relatively barebones codin
 `.friction-lab/config.local.json` is ignored by Git and automatically preferred by setup and verification when it exists. Use it for all scenario-specific tool, MCP, package, forbidden-command, and forbidden-environment settings, even if they do not seem private yet.
 
 Use `.friction-lab/env` only for advanced overrides that are easier as shell values, such as `FRICTION_LAB_ARCHIVE_ROOT` or temporarily pointing `FRICTION_LAB_CONFIG` at a differently named file.
+
+## Restarting The Test Environment
+
+The Dev Container is the disposable Linux workspace where the agent runs. Restarting it means throwing away the old container and creating a fresh one from this repository's `.devcontainer/` settings.
+
+In VS Code, use **Dev Containers: Rebuild and Reopen in Container** from the command palette.
+
+From the terminal, use the Dev Containers CLI commands below.
 
 ## Dev Container CLI
 
@@ -70,6 +78,10 @@ Then open a shell in the container and run:
 ```bash
 ./verify-friction-lab.sh
 ```
+
+## Config Format
+
+Configuration is JSON because the setup and verifier scripts can read it with `jq`, which is already part of the generic baseline. YAML would be friendlier for some people, but it would add another parser/tool dependency to the clean environment. The expected workflow is that a human or agent copies an example config, edits the few fields needed for the experiment, and lets `./verify-friction-lab.sh` catch mistakes before the run begins.
 
 ## Optional Verification Settings
 
