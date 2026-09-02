@@ -97,6 +97,7 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
 - `experiment-brief.md` - reusable, non-sensitive brief template
 - `experiment-brief.local.md` - optional ignored real brief; automatically used when present
+- `docs/branching-design.md` - design doc for RETURN-triggered branching (not yet implemented)
 
 ## Basic Workflow
 
