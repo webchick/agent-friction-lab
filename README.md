@@ -6,9 +6,34 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 ## Quickstart
 
-You need Docker and VS Code with the Dev Containers extension installed.
+You need Docker. This walks through the terminal path; see [Prefer VS Code?](#prefer-vs-code) below for the GUI equivalent.
 
-In VS Code:
+```bash
+git clone https://github.com/webchick/agent-friction-lab.git
+cd agent-friction-lab
+cp .friction-lab/config.json .friction-lab/config.local.json
+npm install -g @devcontainers/cli
+```
+
+Edit `experiment-brief.md` and `.friction-lab/config.local.json` for your test.
+
+Then start the disposable test environment:
+
+```bash
+devcontainer up --workspace-folder . --remove-existing-container
+```
+
+Open a shell in the container and run:
+
+```bash
+./verify-friction-lab.sh
+```
+
+Start the agent experiment only after verification passes.
+
+### Prefer VS Code?
+
+If you'd rather drive the container from an editor than the terminal, install VS Code with the Dev Containers extension instead of the Dev Containers CLI, then:
 
 1. Run **Git: Clone** from the command palette and clone `https://github.com/webchick/agent-friction-lab.git`.
 2. Open the cloned folder in VS Code.
@@ -18,28 +43,11 @@ In VS Code:
 cp .friction-lab/config.json .friction-lab/config.local.json
 ```
 
-In a regular terminal:
+4. Edit `experiment-brief.md` and `.friction-lab/config.local.json` for your test.
+5. Run **Dev Containers: Rebuild and Reopen in Container** from the command palette.
+6. In the container's integrated terminal, run `./verify-friction-lab.sh`.
 
-```bash
-git clone https://github.com/webchick/agent-friction-lab.git
-cd agent-friction-lab
-cp .friction-lab/config.json .friction-lab/config.local.json
-```
-
-Edit `experiment-brief.md` and `.friction-lab/config.local.json` for your test.
-
-Then restart the disposable test environment:
-
-- In VS Code: run **Dev Containers: Rebuild and Reopen in Container** from the command palette.
-- In a terminal: run `devcontainer up --workspace-folder . --remove-existing-container`.
-
-Inside the container:
-
-```bash
-./verify-friction-lab.sh
-```
-
-Start the agent experiment only after verification passes.
+Everything past this point — the scripts, the pipeline, the evidence files — is identical either way; VS Code only changes how you launch and browse the container.
 
 ## What It Provides
 
@@ -86,25 +94,11 @@ Use `.friction-lab/env` only for advanced overrides that are easier as shell val
 
 The Dev Container is the disposable Linux workspace where the agent runs. Restarting it means throwing away the old container and creating a fresh one from this repository's `.devcontainer/` settings.
 
-In VS Code, use **Dev Containers: Rebuild and Reopen in Container** from the command palette.
-
-From the terminal, use the Dev Containers CLI commands below.
+From the terminal, use the Dev Containers CLI commands below. In VS Code, use **Dev Containers: Rebuild and Reopen in Container** from the command palette instead.
 
 ## Dev Container CLI
 
-If you prefer the terminal to VS Code's command palette, install the Dev Containers CLI:
-
-```bash
-npm install -g @devcontainers/cli
-```
-
-Start or rebuild the container from the repository root:
-
-```bash
-devcontainer up --workspace-folder . --remove-existing-container
-```
-
-For a no-cache image rebuild:
+Quickstart above covers installing the Dev Containers CLI and the everyday `devcontainer up --remove-existing-container` restart. For a no-cache image rebuild:
 
 ```bash
 devcontainer build --workspace-folder . --no-cache
