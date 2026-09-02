@@ -17,6 +17,8 @@ npm install -g @devcontainers/cli
 
 Edit `experiment-brief.md` and `.friction-lab/config.local.json` for your test.
 
+Clone into a fresh directory like this, rather than opening an existing checkout of this repo. If your existing checkout's `origin` remote uses the SSH form (`git@github.com:...`), any git operation that touches it inside the container — a fetch, a shell prompt's git-ahead/behind check, an editor's background fetch — will write to `~/.ssh/known_hosts` and fail `verify-friction-lab.sh`'s clean-SSH-state checks, even though no SSH keys are present to actually authenticate. A plain HTTPS clone like the one above has no SSH remote to trigger that.
+
 Then start the disposable test environment:
 
 ```bash
