@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-if [ -f ".airlock/env" ]; then
+if [ -f ".friction-lab/env" ]; then
   set -a
   # shellcheck disable=SC1091
-  . ".airlock/env"
+  . ".friction-lab/env"
   set +a
 fi
 
 failures=0
 
-if [ -n "${AIRLOCK_CONFIG:-}" ]; then
-  config_path="$AIRLOCK_CONFIG"
-elif [ -f ".airlock/config.local.json" ]; then
-  config_path=".airlock/config.local.json"
+if [ -n "${FRICTION_LAB_CONFIG:-}" ]; then
+  config_path="$FRICTION_LAB_CONFIG"
+elif [ -f ".friction-lab/config.local.json" ]; then
+  config_path=".friction-lab/config.local.json"
 else
-  config_path=".airlock/config.json"
+  config_path=".friction-lab/config.json"
 fi
 
 if [ ! -f "$config_path" ]; then
-  printf 'FAIL: airlock config not found: %s\n' "$config_path" >&2
+  printf 'FAIL: friction lab config not found: %s\n' "$config_path" >&2
   exit 1
 fi
 
@@ -28,12 +28,12 @@ read_json_array_words() {
   jq -r "$query | join(\" \")" "$config_path"
 }
 
-required_commands="${AIRLOCK_REQUIRED_COMMANDS:-$(read_json_array_words '.requiredCommands // []')}"
+required_commands="${FRICTION_LAB_REQUIRED_COMMANDS:-$(read_json_array_words '.requiredCommands // []')}"
 configured_mcp_required_commands="$(jq -r '.mcpServers[]?.requiredCommands[]?' "$config_path" | sort -u | tr '\n' ' ')"
-allowed_mcp_servers="${AIRLOCK_ALLOWED_MCP_SERVERS:-$(read_json_array_words '.allowedMcpServers // []')}"
-forbidden_commands="${AIRLOCK_FORBIDDEN_COMMANDS:-$(read_json_array_words '.forbiddenCommands // []')}"
-forbidden_env_pattern="${AIRLOCK_FORBIDDEN_ENV_PATTERN:-$(jq -r '.forbiddenEnvPattern // ""' "$config_path")}"
-prior_trace_pattern="${AIRLOCK_PRIOR_TRACE_PATTERN:-$(jq -r '.priorTracePattern // ""' "$config_path")}"
+allowed_mcp_servers="${FRICTION_LAB_ALLOWED_MCP_SERVERS:-$(read_json_array_words '.allowedMcpServers // []')}"
+forbidden_commands="${FRICTION_LAB_FORBIDDEN_COMMANDS:-$(read_json_array_words '.forbiddenCommands // []')}"
+forbidden_env_pattern="${FRICTION_LAB_FORBIDDEN_ENV_PATTERN:-$(jq -r '.forbiddenEnvPattern // ""' "$config_path")}"
+prior_trace_pattern="${FRICTION_LAB_PRIOR_TRACE_PATTERN:-$(jq -r '.priorTracePattern // ""' "$config_path")}"
 agent_name="$(jq -r '.agent.name // "unspecified"' "$config_path")"
 agent_command="$(jq -r '.agent.command // ""' "$config_path")"
 mcp_provider="$(jq -r '.agent.mcpProvider // "none"' "$config_path")"
@@ -87,7 +87,7 @@ check_no_sensitive_env() {
   fi
 }
 
-printf '== Airlock verification ==\n'
+printf '== Agent Friction Lab verification ==\n'
 printf 'Date: %s\n' "$(date -Is)"
 printf 'OS: %s\n' "$(uname -a)"
 printf 'CWD: %s\n' "$PWD"
@@ -166,7 +166,7 @@ else
 fi
 
 if [ -f "$HOME/.ssh/known_hosts" ]; then
-  fail "\$HOME/.ssh/known_hosts exists; airlock SSH host history must be empty"
+  fail "\$HOME/.ssh/known_hosts exists; friction lab SSH host history must be empty"
 fi
 
 if [ "${HOME#"/Users/"}" != "$HOME" ] || [ "${HOME#"/home/"}" = "$HOME" ]; then
@@ -240,7 +240,7 @@ if [ "$mcp_provider" = "claude" ]; then
       esac
     done
     if [ -n "$unexpected_mcp" ]; then
-      fail "Claude Code lists MCP/connectors outside AIRLOCK_ALLOWED_MCP_SERVERS"
+      fail "Claude Code lists MCP/connectors outside FRICTION_LAB_ALLOWED_MCP_SERVERS"
       printf '%s' "$unexpected_mcp" >&2
     else
       pass "Claude Code lists only allowed MCP/connectors: $allowed_mcp_servers"
@@ -366,7 +366,7 @@ child.stdout.on('data', chunk => {
 send('initialize', {
   protocolVersion: '2024-11-05',
   capabilities: {},
-  clientInfo: { name: 'verify-airlock', version: '1.0.0' },
+  clientInfo: { name: 'verify-friction-lab', version: '1.0.0' },
 });
 NODE
   then
@@ -379,8 +379,8 @@ else
 fi
 
 if [ "$failures" -eq 0 ]; then
-  printf '\nAll airlock checks passed.\n'
+  printf '\nAll friction lab checks passed.\n'
 else
-  printf '\n%d airlock check(s) failed.\n' "$failures" >&2
+  printf '\n%d friction lab check(s) failed.\n' "$failures" >&2
   exit 1
 fi

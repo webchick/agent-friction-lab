@@ -1,7 +1,7 @@
 .DS_Store
-.airlock/env
-.airlock/config.local.json
-.airlock/config.*.local.json
+.friction-lab/env
+.friction-lab/config.local.json
+.friction-lab/config.*.local.json
 .playwright-mcp/
 environment.md
 raw-log.md

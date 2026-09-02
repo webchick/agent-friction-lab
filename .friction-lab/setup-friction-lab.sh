@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-if [ -f ".airlock/env" ]; then
+if [ -f ".friction-lab/env" ]; then
   set -a
   # shellcheck disable=SC1091
-  . ".airlock/env"
+  . ".friction-lab/env"
   set +a
 fi
 
-if [ -n "${AIRLOCK_CONFIG:-}" ]; then
-  config_path="$AIRLOCK_CONFIG"
-elif [ -f ".airlock/config.local.json" ]; then
-  config_path=".airlock/config.local.json"
+if [ -n "${FRICTION_LAB_CONFIG:-}" ]; then
+  config_path="$FRICTION_LAB_CONFIG"
+elif [ -f ".friction-lab/config.local.json" ]; then
+  config_path=".friction-lab/config.local.json"
 else
-  config_path=".airlock/config.json"
+  config_path=".friction-lab/config.json"
 fi
 npm_global_bin="$(npm prefix -g)/bin"
 setup_path="$npm_global_bin:$PATH"
 
 if [ ! -f "$config_path" ]; then
-  printf 'Airlock config not found: %s\n' "$config_path" >&2
+  printf 'Agent Friction Lab config not found: %s\n' "$config_path" >&2
   exit 1
 fi
 
@@ -47,7 +47,7 @@ mcp_provider="$(jq -r '.agent.mcpProvider // "none"' "$config_path")"
 
 if [ "$mcp_provider" != "claude" ]; then
   printf 'No Claude MCP setup requested (agent.mcpProvider=%s).\n' "$mcp_provider"
-  printf 'Airlock setup complete from %s\n' "$config_path"
+  printf 'Agent Friction Lab setup complete from %s\n' "$config_path"
   exit 0
 fi
 
@@ -76,4 +76,4 @@ jq -c '.mcpServers[]?' "$config_path" | while IFS= read -r server; do
   claude mcp add --scope user "$name" -- "$command" "${args[@]}"
 done
 
-printf 'Airlock setup complete from %s\n' "$config_path"
+printf 'Agent Friction Lab setup complete from %s\n' "$config_path"

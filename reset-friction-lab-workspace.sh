@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-if [ -f ".airlock/env" ]; then
+if [ -f ".friction-lab/env" ]; then
   set -a
   # shellcheck disable=SC1091
-  . ".airlock/env"
+  . ".friction-lab/env"
   set +a
 fi
 
-archive_root="${AIRLOCK_ARCHIVE_ROOT:-/private/tmp/agent-airlock-archives}"
+archive_root="${FRICTION_LAB_ARCHIVE_ROOT:-/private/tmp/agent-friction-lab-archives}"
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 archive_dir="$archive_root/$timestamp"
 
 baseline_paths=(
   ".devcontainer"
-  ".airlock"
+  ".friction-lab"
   "README.md"
   "agent-runbook.md"
   "experiment-brief.md"
-  "verify-airlock.sh"
-  "reset-airlock-workspace.sh"
+  "verify-friction-lab.sh"
+  "reset-friction-lab-workspace.sh"
 )
 
 cruft_paths=(
@@ -36,21 +36,21 @@ cruft_paths=(
 
 usage() {
   cat <<'EOF'
-Usage: ./reset-airlock-workspace.sh [--yes]
+Usage: ./reset-friction-lab-workspace.sh [--yes]
 
 Moves known experiment/preflight artifacts out of this workspace and into:
-  /private/tmp/agent-airlock-archives/<timestamp>/
+  /private/tmp/agent-friction-lab-archives/<timestamp>/
 
 The baseline harness files are left in place:
   .devcontainer/
-  .airlock/
+  .friction-lab/
   README.md
   agent-runbook.md
   experiment-brief.md
-  verify-airlock.sh
-  reset-airlock-workspace.sh
+  verify-friction-lab.sh
+  reset-friction-lab-workspace.sh
 
-Set AIRLOCK_ARCHIVE_ROOT to choose a different archive location.
+Set FRICTION_LAB_ARCHIVE_ROOT to choose a different archive location.
 EOF
 }
 
@@ -75,7 +75,7 @@ for path in "${cruft_paths[@]}"; do
 done
 
 if [ "${#present[@]}" -eq 0 ]; then
-  printf 'No known airlock run artifacts found. Workspace already looks baseline-ready.\n'
+  printf 'No known friction lab run artifacts found. Workspace already looks baseline-ready.\n'
   exit 0
 fi
 
@@ -105,4 +105,4 @@ for path in "${baseline_paths[@]}"; do
 done
 
 printf '\nMoved artifacts to: %s\n' "$archive_dir"
-printf 'Now rebuild/reopen the devcontainer and run ./verify-airlock.sh.\n'
+printf 'Now rebuild/reopen the devcontainer and run ./verify-friction-lab.sh.\n'

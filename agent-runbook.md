@@ -1,10 +1,10 @@
-# Airlock Agent Experiment Runbook
+# Agent Friction Lab Agent Experiment Runbook
 
 Use this runbook with a task-specific brief. Do not begin the task until preflight passes.
 
 ## Preflight
 
-Before starting task work, verify and record that the environment matches the intended airlock conditions.
+Before starting task work, verify and record that the environment matches the intended friction lab conditions.
 
 The environment should begin with:
 
@@ -17,7 +17,7 @@ The environment should begin with:
 - browser automation available from the beginning,
 - generic shell, git, package manager, curl, jq, and web access available.
 
-The exact allowed MCP servers, extra required commands, forbidden commands, forbidden environment patterns, and prior-run trace patterns are declared in `.airlock/config.json`.
+The exact allowed MCP servers, extra required commands, forbidden commands, forbidden environment patterns, and prior-run trace patterns are declared in `.friction-lab/config.json`.
 
 The model's stock training knowledge is allowed and is part of the real-world test. Treat this as a cold-context and cold-environment test, not a literal test of zero prior model knowledge.
 
@@ -33,9 +33,9 @@ Before touching the target task, create `environment.md` containing literal outp
 - configured MCP servers/plugins/skills,
 - a harmless Playwright/browser smoke test proving browser automation works before task work starts.
 
-Run `./verify-airlock.sh` and record its output as evidence.
+Run `./verify-friction-lab.sh` and record its output as evidence.
 
-If the environment is not airlocked in a way that could materially affect comparability, stop and RETURN before proceeding.
+If the environment is not friction-lab-ready in a way that could materially affect comparability, stop and RETURN before proceeding.
 
 For minor ambiguities that do not materially affect the experiment, make a reasonable decision yourself and record the assumption.
 
@@ -101,7 +101,7 @@ Do not invent a post-hoc rationale if the contemporaneous record does not contai
 
 ## Task Execution
 
-Starting from the verified airlock environment:
+Starting from the verified friction lab environment:
 
 1. Determine independently how to accomplish the task using only stock model knowledge plus information/resources discovered during the run.
 2. Attempt the task.

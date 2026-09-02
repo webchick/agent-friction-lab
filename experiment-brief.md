@@ -1,6 +1,6 @@
-# Airlock Experiment Brief
+# Agent Friction Lab Experiment Brief
 
-Fill this file in for a specific airlock agent experiment.
+Fill this file in for a specific friction lab agent experiment.
 
 ## Reason
 
@@ -70,7 +70,7 @@ Examples:
 
 ## Preflight Additions
 
-Set experiment-specific airlock checks here. Put scenario-specific values in `.airlock/config.local.json`; that file is ignored by Git and is automatically preferred by setup and verification when it exists. Use `.airlock/config.json` only for reusable defaults that should be committed.
+Set experiment-specific friction lab checks here. Put scenario-specific values in `.friction-lab/config.local.json`; that file is ignored by Git and is automatically preferred by setup and verification when it exists. Use `.friction-lab/config.json` only for reusable defaults that should be committed.
 
 Suggested config fields:
 
@@ -93,11 +93,11 @@ Suggested config fields:
 }
 ```
 
-Optional local `.airlock/env` overrides for temporary shell values:
+Optional local `.friction-lab/env` overrides for temporary shell values:
 
 ```sh
-AIRLOCK_ARCHIVE_ROOT=/path/to/durable/archive
-AIRLOCK_CONFIG=.airlock/some-other-local-profile.json
+FRICTION_LAB_ARCHIVE_ROOT=/path/to/durable/archive
+FRICTION_LAB_CONFIG=.friction-lab/some-other-local-profile.json
 ```
 
 ## Tests
