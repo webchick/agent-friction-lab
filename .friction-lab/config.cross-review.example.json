@@ -29,7 +29,7 @@
       "name": "Claude Code (mediator)",
       "command": "claude",
       "mcpProvider": "none",
-      "notes": "Runs headless in an isolated working directory containing findings.md, review.md, and the evidence, and reconciles the two into final-report.md."
+      "notes": "Runs headless in an isolated working directory containing the full evidence chain plus findings.md and review.md, and reconciles the two into final-report.md."
     }
   ],
   "reviewProtocol": {
@@ -43,6 +43,8 @@
       "artifacts/"
     ],
     "synthesisArtifacts": [
+      "environment.md",
+      "raw-log.md",
       "findings.md",
       "review.md",
       "evidence-index.md",

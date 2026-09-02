@@ -144,7 +144,7 @@ The reviewer produces `review.md`, structured like `findings.md` (Observed / Inf
 
 ## Synthesis
 
-If the experiment config declares a mediator role, the mediator runs after the reviewer, in its own working directory containing `findings.md`, `review.md`, `evidence-index.md`, `evidence/`, `artifacts/`, `agent-runbook.md`, and `experiment-brief.md`. The same restriction applies as for the reviewer: reasoning only from the recorded evidence and the two prior documents, no shell/code execution, no web search or fetch, no MCP tools.
+If the experiment config declares a mediator role, the mediator runs after the reviewer, in its own working directory containing `environment.md`, `raw-log.md`, `findings.md`, `review.md`, `evidence-index.md`, `evidence/`, `artifacts/`, `agent-runbook.md`, and `experiment-brief.md` — the full evidence chain, not just the two conclusions documents, so the mediator can independently check a reviewer claim about `raw-log.md` or `environment.md` rather than taking it on trust. The same restriction applies as for the reviewer: reasoning only from the recorded evidence and the two prior documents, no shell/code execution, no web search or fetch, no MCP tools.
 
 The mediator's job is to reconcile the executor's and reviewer's conclusions, not to referee a winner. Where the two disagree, surface the disagreement to the human with both sides' evidence cited rather than silently resolving it.
 

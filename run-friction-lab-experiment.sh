@@ -180,7 +180,7 @@ run_mediator() {
   (
     cd "$run_dir"
     "$mediator_command" -p --restricted --strict-mcp-config --permission-mode acceptEdits "${budget_args[@]}" \
-      "You are the mediator agent. Read ./agent-runbook.md's Synthesis section for your responsibilities. Reconcile ./findings.md (executor) and ./review.md (reviewer) using ./evidence-index.md and the evidence/artifacts directories as ground truth. Produce ./final-report.md per the Synthesis section: executive summary; ground truth with confidence, noting whether executor and reviewer agree; points of agreement, cited; points of disagreement, cited from both sides and left unresolved rather than picked; reconciled recommendations, cited; and open follow-up or escalation questions for the human. Explicitly flag disagreements between executor and reviewer rather than silently resolving them in favor of one side."
+      "You are the mediator agent. Read ./agent-runbook.md's Synthesis section for your responsibilities. Reconcile ./findings.md (executor) and ./review.md (reviewer) using ./environment.md, ./raw-log.md, ./evidence-index.md, and the evidence/artifacts directories as ground truth -- check a reviewer claim about any of those files directly rather than taking it on trust. Produce ./final-report.md per the Synthesis section: executive summary; ground truth with confidence, noting whether executor and reviewer agree; points of agreement, cited; points of disagreement, cited from both sides and left unresolved rather than picked; reconciled recommendations, cited; and open follow-up or escalation questions for the human. Explicitly flag disagreements between executor and reviewer rather than silently resolving them in favor of one side."
   )
 
   if [ ! -f "$run_dir/final-report.md" ]; then
