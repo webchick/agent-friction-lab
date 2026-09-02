@@ -6,12 +6,13 @@ usage() {
 Usage: ./run-experiment.sh "<scenario description>" [--budget <usd>] [--force]
 
 Runs a full Agent Friction Lab experiment with minimal ceremony: cleans up any
-leftover run artifacts, sets up the cross-review config and brief, builds a
-fresh disposable container, verifies it, then hands you an interactive
-executor session to watch and drive. The executor is the one stage of this
-pipeline that hasn't been validated running unattended, so it stays
-supervised on purpose -- everything else (setup, review, synthesis, printing
-the result) is automatic.
+leftover run artifacts, sets up the brief, builds a fresh disposable container
+(barebones cross-review by default -- no browser automation unless a branch
+adds it, see docs/branching-design.md), verifies it, then hands you an
+interactive executor session to watch and drive. The executor is the one
+stage of this pipeline that hasn't been validated running unattended, so it
+stays supervised on purpose -- everything else (setup, review, synthesis,
+printing the result) is automatic.
 
   --budget <usd>   Cap API spend per pipeline stage (default: 15). Ignored if
                    .friction-lab/env already sets FRICTION_LAB_MAX_BUDGET_USD.
@@ -86,11 +87,6 @@ fi
 
 printf '\n===== Cleaning up any leftover run artifacts =====\n'
 ./reset-friction-lab-workspace.sh --yes
-
-if [ ! -f ".friction-lab/config.local.json" ]; then
-  printf '\nNo .friction-lab/config.local.json found; using the cross-review (executor+reviewer+mediator) profile.\n'
-  cp .friction-lab/config.cross-review.example.json .friction-lab/config.local.json
-fi
 
 if [ -f "experiment-brief.local.md" ] && [ "$force" -ne 1 ]; then
   printf '\nexperiment-brief.local.md already exists.\n' >&2

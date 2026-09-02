@@ -186,9 +186,9 @@ The expected-MCP-server list the verifier checks against is derived from `mcpSer
 
 `.friction-lab/env` and `.friction-lab/config.local.json` are ignored by Git so local experiment details do not accidentally get committed to the public harness repo.
 
-The default config enables Claude Code plus Playwright MCP because browser automation is a common experiment need. Remove or replace the agents, package, browser, and MCP entries for a different agent or a shell-only friction lab.
+The default config (`.friction-lab/config.json`) is deliberately barebones — the executor/reviewer/mediator roles are there, but `mcpServers` is empty, so no browser automation is available unless a run specifically needs it. `.friction-lab/config.claude-playwright.example.json` is the recipe for adding Playwright MCP back in when a target has no CLI path forward (see `docs/branching-design.md`). Remove or replace the agents, package, browser, and MCP entries for a different agent or a shell-only friction lab.
 
-Examples are available at `.friction-lab/config.claude-playwright.example.json`, `.friction-lab/config.cross-review.example.json`, and `.friction-lab/config.shell-only.example.json`.
+Examples are available at `.friction-lab/config.claude-playwright.example.json` and `.friction-lab/config.shell-only.example.json`.
 
 ## Agent Roles And Review
 
@@ -199,7 +199,7 @@ Use `agents` to declare the roles participating in the experiment. Common roles 
 - `mediator`: an agent that reconciles the executor's and reviewer's findings into a cited final report, surfacing disagreements rather than resolving them.
 - `observer`: a non-executing role that records or summarizes behavior.
 
-Use `reviewProtocol` to describe the expected handoff pattern. A cross-review run uses Claude Code as the executor inside the container, then hands `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` to a second, isolated Claude Code invocation as reviewer, and finally to a third as mediator. `command` is a free string, so a different external CLI agent can be substituted for `reviewer` or `mediator` instead. See `.friction-lab/config.cross-review.example.json` for the full three-role profile, and `run-friction-lab-experiment.sh` for the script that runs it end to end.
+Use `reviewProtocol` to describe the expected handoff pattern. A cross-review run uses Claude Code as the executor inside the container, then hands `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` to a second, isolated Claude Code invocation as reviewer, and finally to a third as mediator. `command` is a free string, so a different external CLI agent can be substituted for `reviewer` or `mediator` instead. `.friction-lab/config.json`, the tracked default, already declares the full three-role profile — see `run-friction-lab-experiment.sh` for the script that runs it end to end.
 
 Reviewer and mediator agents do not have to run inside the same container as the executor, and even inside the same container they run in their own working directory containing only copies of the handoff artifacts — never the executor's live session or working tree. Keeping them isolated reduces cross-contamination: the executor's container/working tree remains the measured environment, while the reviewer and mediator inspect only the recorded evidence. Both run with shell/code execution, web search/fetch, and MCP tools disabled (`claude --restricted --strict-mcp-config` for the Claude Code profile), so they can only reason from what was recorded, not go re-verify or re-research the task themselves. If an experiment intentionally needs two agents sharing a container, declare both as required installed agents and document that shared environment as part of the baseline.
 

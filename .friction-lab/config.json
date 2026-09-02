@@ -14,14 +14,49 @@
       "name": "Claude Code",
       "command": "claude",
       "mcpProvider": "claude"
+    },
+    {
+      "id": "reviewer",
+      "role": "reviewer",
+      "name": "Claude Code (reviewer)",
+      "command": "claude",
+      "mcpProvider": "none",
+      "notes": "Runs headless (claude -p --restricted --strict-mcp-config) in an isolated working directory containing only the handoff artifacts. Swap 'command' for a different CLI agent if you want an external reviewer instead."
+    },
+    {
+      "id": "mediator",
+      "role": "mediator",
+      "name": "Claude Code (mediator)",
+      "command": "claude",
+      "mcpProvider": "none",
+      "notes": "Runs headless in an isolated working directory containing the full evidence chain plus findings.md and review.md, and reconciles the two into final-report.md."
     }
   ],
   "reviewProtocol": {
-    "description": "One configured agent executes the experiment and records evidence."
+    "description": "The executor produces evidence and findings, starting barebones -- no MCP servers registered. The reviewer independently examines the same evidence and produces its own findings. The mediator reconciles the two into a cited final report, surfacing disagreements rather than resolving them, before escalating to the human. See config.claude-playwright.example.json for the recipe to add Playwright MCP if a real run needs to branch past a barebones blocker (docs/branching-design.md).",
+    "handoffArtifacts": [
+      "environment.md",
+      "raw-log.md",
+      "evidence-index.md",
+      "findings.md",
+      "evidence/",
+      "artifacts/",
+      "runs/"
+    ],
+    "synthesisArtifacts": [
+      "environment.md",
+      "raw-log.md",
+      "findings.md",
+      "review.md",
+      "evidence-index.md",
+      "evidence/",
+      "artifacts/",
+      "runs/"
+    ]
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
-  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts|runs)(/|$)|(^|/)\\.playwright-mcp(/|$)",
   "npmGlobalPackages": [
     "@anthropic-ai/claude-code",
     "playwright",
@@ -33,24 +68,5 @@
   "playwrightMcpBrowsers": [
     "chrome-for-testing"
   ],
-  "mcpServers": [
-    {
-      "name": "playwright",
-      "command": "playwright-mcp",
-      "args": [
-        "--isolated",
-        "--headless",
-        "--browser",
-        "chromium",
-        "--no-sandbox",
-        "--output-dir",
-        "/tmp/playwright-mcp"
-      ],
-      "requiredCommands": [
-        "playwright",
-        "playwright-mcp"
-      ],
-      "smokeTest": "example.com-accessibility-snapshot"
-    }
-  ]
+  "mcpServers": []
 }

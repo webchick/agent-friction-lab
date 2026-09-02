@@ -12,7 +12,7 @@
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
-  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts|runs)(/|$)|(^|/)\\.playwright-mcp(/|$)",
   "npmGlobalPackages": [],
   "playwrightBrowsers": [],
   "playwrightMcpBrowsers": [],

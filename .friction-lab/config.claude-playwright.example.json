@@ -14,14 +14,49 @@
       "name": "Claude Code",
       "command": "claude",
       "mcpProvider": "claude"
+    },
+    {
+      "id": "reviewer",
+      "role": "reviewer",
+      "name": "Claude Code (reviewer)",
+      "command": "claude",
+      "mcpProvider": "none",
+      "notes": "Runs headless (claude -p --restricted --strict-mcp-config) in an isolated working directory containing only the handoff artifacts. Swap 'command' for a different CLI agent if you want an external reviewer instead."
+    },
+    {
+      "id": "mediator",
+      "role": "mediator",
+      "name": "Claude Code (mediator)",
+      "command": "claude",
+      "mcpProvider": "none",
+      "notes": "Runs headless in an isolated working directory containing the full evidence chain plus findings.md and review.md, and reconciles the two into final-report.md."
     }
   ],
   "reviewProtocol": {
-    "description": "One configured agent executes the experiment and records evidence."
+    "description": "Same as the default profile (.friction-lab/config.json), with Playwright MCP registered. This is the branch recipe: what config.local.json should look like after a barebones run hits a real blocker with no CLI path forward and the human authorizes adding browser automation. See docs/branching-design.md.",
+    "handoffArtifacts": [
+      "environment.md",
+      "raw-log.md",
+      "evidence-index.md",
+      "findings.md",
+      "evidence/",
+      "artifacts/",
+      "runs/"
+    ],
+    "synthesisArtifacts": [
+      "environment.md",
+      "raw-log.md",
+      "findings.md",
+      "review.md",
+      "evidence-index.md",
+      "evidence/",
+      "artifacts/",
+      "runs/"
+    ]
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
-  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts|runs)(/|$)|(^|/)\\.playwright-mcp(/|$)",
   "npmGlobalPackages": [
     "@anthropic-ai/claude-code",
     "playwright",

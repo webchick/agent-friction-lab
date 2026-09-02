@@ -96,7 +96,7 @@ Suggested config fields:
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
-  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)",
+  "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts|runs)(/|$)",
   "npmGlobalPackages": [],
   "playwrightBrowsers": [],
   "playwrightMcpBrowsers": [],

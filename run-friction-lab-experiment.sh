@@ -84,10 +84,15 @@ copy_artifacts() {
   local dest="$1"
   shift
   mkdir -p "$dest"
-  local item
+  local item stripped
   for item in "$@"; do
-    if [ -e "$item" ]; then
-      cp -R "$item" "$dest/"
+    stripped="${item%/}"
+    # Strip any trailing slash before cp -R: BSD cp (macOS) flattens a
+    # trailing-slash directory's contents into dest instead of nesting it,
+    # unlike GNU cp -- stripping it first makes the nesting consistent
+    # across both.
+    if [ -e "$stripped" ]; then
+      cp -R "$stripped" "$dest/"
     fi
   done
 }
