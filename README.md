@@ -44,6 +44,33 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 Use `.friction-lab/env` only for advanced overrides that are easier as shell values, such as `FRICTION_LAB_ARCHIVE_ROOT` or temporarily pointing `FRICTION_LAB_CONFIG` at a differently named file.
 
+## Dev Container CLI
+
+If you prefer the terminal to VS Code's command palette, install the Dev Containers CLI:
+
+```bash
+npm install -g @devcontainers/cli
+```
+
+Start or rebuild the container from the repository root:
+
+```bash
+devcontainer up --workspace-folder . --remove-existing-container
+```
+
+For a no-cache image rebuild:
+
+```bash
+devcontainer build --workspace-folder . --no-cache
+devcontainer up --workspace-folder . --remove-existing-container
+```
+
+Then open a shell in the container and run:
+
+```bash
+./verify-friction-lab.sh
+```
+
 ## Optional Verification Settings
 
 The verifier is intentionally generic. For each experiment, edit `.friction-lab/config.local.json`:
