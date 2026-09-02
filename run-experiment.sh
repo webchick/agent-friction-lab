@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./run-experiment.sh "<scenario description>" [--budget <usd>] [--force]
+Usage: ./run-experiment.sh ["<scenario description>"] [--budget <usd>] [--force]
 
 Runs a full Agent Friction Lab experiment with minimal ceremony: cleans up any
 leftover run artifacts, sets up the brief, builds a fresh disposable container
@@ -14,16 +14,26 @@ stage of this pipeline that hasn't been validated running unattended, so it
 stays supervised on purpose -- everything else (setup, review, synthesis,
 printing the result) is automatic.
 
+Two ways to use it:
+  - Quick/exploratory: pass a scenario description and a minimal brief gets
+    generated from it (Outcome only, everything else defaults).
+  - Rigorous/benchmark: write a full experiment-brief.local.md by hand first
+    (Targets, Starting Conditions, Allowed Resources, Off-Limits, Tests, Timing
+    -- the complete template in experiment-brief.md), then run this with no
+    scenario argument at all. The existing brief is used as-is.
+
   --budget <usd>   Cap API spend per pipeline stage (default: 15). Ignored if
                    .friction-lab/env already sets FRICTION_LAB_MAX_BUDGET_USD.
-  --force          Overwrite an existing experiment-brief.local.md
+  --force          Overwrite an existing experiment-brief.local.md with a new
+                   scenario (requires passing one)
 
 Run this from inside an existing clone of the harness (same one you'd run
 verify-friction-lab.sh from), not a fresh clone each time -- reset happens
 automatically as part of this script.
 
-Example:
+Examples:
   ./run-experiment.sh "Sign up for a free trial of Contentful and publish a first content entry."
+  ./run-experiment.sh   # uses the experiment-brief.local.md you already wrote
 EOF
 }
 
@@ -60,14 +70,23 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "$scenario" ]; then
+if [ ! -f "run-friction-lab-experiment.sh" ] || [ ! -f "agent-runbook.md" ]; then
+  printf 'Run this from the root of an Agent Friction Lab checkout.\n' >&2
+  exit 1
+fi
+
+brief_exists=0
+[ -f "experiment-brief.local.md" ] && brief_exists=1
+
+if [ -z "$scenario" ] && { [ "$brief_exists" -eq 0 ] || [ "$force" -eq 1 ]; }; then
+  printf 'A scenario description is required unless experiment-brief.local.md already exists (and --force is not set).\n' >&2
   usage >&2
   exit 2
 fi
 
-if [ ! -f "run-friction-lab-experiment.sh" ] || [ ! -f "agent-runbook.md" ]; then
-  printf 'Run this from the root of an Agent Friction Lab checkout.\n' >&2
-  exit 1
+if [ "$brief_exists" -eq 1 ] && [ "$force" -ne 1 ] && [ -n "$scenario" ]; then
+  printf 'experiment-brief.local.md already exists; using it as-is and ignoring the scenario argument.\n' >&2
+  printf 'Pass --force to overwrite it with the new scenario instead.\n' >&2
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -88,13 +107,8 @@ fi
 printf '\n===== Cleaning up any leftover run artifacts =====\n'
 ./reset-friction-lab-workspace.sh --yes
 
-if [ -f "experiment-brief.local.md" ] && [ "$force" -ne 1 ]; then
-  printf '\nexperiment-brief.local.md already exists.\n' >&2
-  printf 'Re-run with --force to overwrite it with the new scenario, or remove it yourself first.\n' >&2
-  exit 1
-fi
-
-cat > experiment-brief.local.md <<BRIEF
+if [ "$brief_exists" -eq 0 ] || [ "$force" -eq 1 ]; then
+  cat > experiment-brief.local.md <<BRIEF
 # Agent Friction Lab Experiment Brief
 
 ## Reason
@@ -116,6 +130,9 @@ None. All standing defaults from agent-runbook.md apply in full (Preflight,
 Boundaries, Evidence Chain, RETURN protocol) with no scenario-specific
 exceptions.
 BRIEF
+else
+  printf 'Using existing experiment-brief.local.md.\n'
+fi
 
 remote_env_args=()
 if [ ! -f ".friction-lab/env" ] || ! grep -q '^FRICTION_LAB_MAX_BUDGET_USD=' ".friction-lab/env" 2>/dev/null; then

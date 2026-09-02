@@ -14,8 +14,10 @@ The environment should begin with:
 - no target-specific MCP servers, connectors, plugins, agent skills, or injected product documentation,
 - no prior experiment traces or findings visible in the active workspace,
 - no host SSH keys or target credentials,
-- browser automation available from the beginning,
+- browser automation packages/binaries pre-installed and usable via raw shell scripting (Playwright is baked into the image for this reason) from the beginning, regardless of config,
 - generic shell, git, package manager, curl, jq, and web access available.
+
+Browser automation being pre-installed is not the same thing as a browser-control MCP tool being registered with the agent — whether one is registered is config-dependent (`.friction-lab/config.json`'s `mcpServers`) and, in the barebones default, deliberately isn't: registering one is an explicit, human-authorized branch action (`docs/branching-design.md`), not a starting capability. Don't read "browser automation available from the beginning" as "a browser-control MCP tool is registered" — check the resolved config's `mcpServers` for what's actually true this run, and use raw scripting against the pre-installed packages if no MCP tool is registered.
 
 Connectors (Gmail, Google Calendar, Google Drive, and similar first-party integrations) are tied to the authenticated account, not to container/filesystem state — rebuilding the container does not remove them if the agent authenticates as the same account each time. The devcontainer sets `ENABLE_CLAUDEAI_MCP_SERVERS=false` to prevent them from loading at all for a Claude Code executor, but check for them explicitly anyway (`claude mcp list` or the equivalent for the configured agent), not just for locally-configured MCP servers — this is a real environment defect, not a hypothetical one, found during this harness's own validation, and the check should not depend solely on that one setting continuing to be present and effective. Account-level access to a real inbox or drive can materially change how much real-world friction a task actually has (e.g. reading a signup verification email directly instead of experiencing that step as friction).
 
@@ -35,7 +37,7 @@ Before touching the target task, create `environment.md` containing literal outp
 - contents of `~/.ssh` if present,
 - files visible in the workspace,
 - configured MCP servers/connectors/plugins/skills,
-- a harmless Playwright/browser smoke test proving browser automation works before task work starts.
+- a harmless Playwright/browser smoke test proving browser automation works before task work starts, via whatever means this run's config actually provides (a registered MCP tool if one is configured, otherwise raw scripting against the pre-installed Playwright packages).
 
 Run `./verify-friction-lab.sh` and record its output as evidence.
 
