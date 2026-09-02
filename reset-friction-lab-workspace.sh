@@ -19,6 +19,7 @@ baseline_paths=(
   "agent-runbook.md"
   "experiment-brief.md"
   "verify-friction-lab.sh"
+  "run-friction-lab-experiment.sh"
   "reset-friction-lab-workspace.sh"
 )
 
@@ -27,10 +28,12 @@ cruft_paths=(
   "raw-log.md"
   "evidence-index.md"
   "findings.md"
+  "review.md"
   "final-report.md"
   "evidence"
   "artifacts"
   "runs"
+  "review"
   ".playwright-mcp"
 )
 
@@ -48,6 +51,7 @@ The baseline harness files are left in place:
   agent-runbook.md
   experiment-brief.md
   verify-friction-lab.sh
+  run-friction-lab-experiment.sh
   reset-friction-lab-workspace.sh
 
 Set FRICTION_LAB_ARCHIVE_ROOT to choose a different archive location.

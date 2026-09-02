@@ -62,6 +62,7 @@ Start the agent experiment only after verification passes.
 - `.friction-lab/setup-friction-lab.sh` - installs configured packages/browsers and applies MCP configuration inside the container
 - `.devcontainer/` - disposable friction lab container definition
 - `verify-friction-lab.sh` - automated preflight verification
+- `run-friction-lab-experiment.sh` - runs the executor/reviewer/mediator pipeline
 - `reset-friction-lab-workspace.sh` - archive/remove run artifacts from the active workspace
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
 - `experiment-brief.md` - task-specific brief template to fill in for each experiment
@@ -73,8 +74,8 @@ Start the agent experiment only after verification passes.
 3. Copy `.friction-lab/config.json` to `.friction-lab/config.local.json` and edit the local file for the experiment.
 4. Restart the disposable Dev Container so the local config is applied.
 5. Run `./verify-friction-lab.sh`.
-6. Start the agent experiment only after the verifier passes.
-7. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
+6. Start the agent experiment only after the verifier passes: run `./run-friction-lab-experiment.sh` for the executor/reviewer/mediator pipeline, or drive the executor interactively yourself and run `./run-friction-lab-experiment.sh review` (or `synthesize`) once `findings.md` exists.
+7. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `review.md`, `final-report.md`, `evidence/`, and `artifacts/` after each run.
 8. Run `./reset-friction-lab-workspace.sh --yes` before the next friction lab attempt.
 
 `.friction-lab/config.local.json` is ignored by Git and automatically preferred by setup and verification when it exists. Use it for all scenario-specific tool, MCP, package, forbidden-command, and forbidden-environment settings, even if they do not seem private yet.
@@ -178,14 +179,30 @@ Examples are available at `.friction-lab/config.claude-playwright.example.json`,
 Use `agents` to declare the roles participating in the experiment. Common roles are:
 
 - `executor`: the agent that attempts the task.
-- `reviewer`: an agent or human-in-the-loop helper that examines evidence and challenges conclusions.
+- `reviewer`: an agent that independently examines the executor's evidence and produces its own findings.
+- `mediator`: an agent that reconciles the executor's and reviewer's findings into a cited final report, surfacing disagreements rather than resolving them.
 - `observer`: a non-executing role that records or summarizes behavior.
 
-Use `reviewProtocol` to describe the expected handoff pattern. For example, a cross-review run might use Claude Code as the executor inside the container, then pass `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` to an external Codex reviewer before escalating to a human.
+Use `reviewProtocol` to describe the expected handoff pattern. A cross-review run uses Claude Code as the executor inside the container, then hands `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` to a second, isolated Claude Code invocation as reviewer, and finally to a third as mediator. `command` is a free string, so a different external CLI agent can be substituted for `reviewer` or `mediator` instead. See `.friction-lab/config.cross-review.example.json` for the full three-role profile, and `run-friction-lab-experiment.sh` for the script that runs it end to end.
 
-Reviewer agents do not have to run inside the same container. Keeping the reviewer external can reduce cross-contamination because the executor's container remains the measured environment, while the reviewer inspects only the recorded evidence. If an experiment intentionally needs two agents in the same container, declare both as required installed agents and document that shared environment as part of the baseline.
+Reviewer and mediator agents do not have to run inside the same container as the executor, and even inside the same container they run in their own working directory containing only copies of the handoff artifacts — never the executor's live session or working tree. Keeping them isolated reduces cross-contamination: the executor's container/working tree remains the measured environment, while the reviewer and mediator inspect only the recorded evidence. Both run with shell/code execution, web search/fetch, and MCP tools disabled (`claude --restricted --strict-mcp-config` for the Claude Code profile), so they can only reason from what was recorded, not go re-verify or re-research the task themselves. If an experiment intentionally needs two agents sharing a container, declare both as required installed agents and document that shared environment as part of the baseline.
 
 This is related to multi-agent debate, adversarial collaboration, and cross-examination patterns. The goal is not to make agents argue theatrically; it is to make claims easier to verify before a human has to make a decision.
+
+## Running The Experiment Pipeline
+
+`run-friction-lab-experiment.sh` runs the executor/reviewer/mediator pipeline declared in the resolved config. It takes one subcommand:
+
+```bash
+./run-friction-lab-experiment.sh execute      # run the executor, if findings.md does not already exist
+./run-friction-lab-experiment.sh review       # run the reviewer against the handoff artifacts
+./run-friction-lab-experiment.sh synthesize   # run the mediator against findings.md + review.md
+./run-friction-lab-experiment.sh all          # execute, review, synthesize in sequence (default)
+```
+
+`execute` only launches Claude Code headlessly with full tool access if you pass `--unattended`; otherwise, if `findings.md` is missing, it stops and tells you to either drive the executor interactively yourself (as documented above) or re-run with `--unattended`. This keeps unattended full-tool-access runs an explicit choice rather than a script default. `review` and `synthesize` always run headless and isolated, since they only need read access to already-captured evidence.
+
+Each stage's working artifacts live under `review/<timestamp>/`; `reset-friction-lab-workspace.sh` sweeps that directory along with the other run artifacts.
 
 ## Baseline Bias
 

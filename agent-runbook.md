@@ -118,7 +118,9 @@ Do not describe friction from one chosen route as inherent to the target unless 
 
 If the experiment config declares a cross-review or multi-agent review protocol, preserve the handoff artifacts before asking the reviewer to evaluate the run.
 
-Reviewer agents may be external to the executor container. This preserves the executor container as the measured environment and limits the reviewer to the evidence record. If multiple agents intentionally run inside the same container, record that shared environment in `environment.md`.
+Reviewer agents may be external to the executor container. This preserves the executor container as the measured environment and limits the reviewer to the evidence record. If multiple agents intentionally run inside the same container, record that shared environment in `environment.md`. At minimum, the reviewer runs in its own working directory containing only copies of the handoff artifacts below, not the executor's live session or working tree.
+
+The reviewer must reason only from the recorded evidence: no shell/code execution, no web search or fetch, no MCP tools, no re-running or re-verifying the task itself. If a claim cannot be checked from the handoff artifacts alone, say so rather than going to find out.
 
 The executor should provide:
 
@@ -137,6 +139,25 @@ The reviewer should:
 - return specific follow-up questions or escalation points rather than silently rewriting the executor's conclusions.
 
 Use the review as a cross-examination step before human escalation, not as an automatic override.
+
+The reviewer produces `review.md`, structured like `findings.md` (Observed / Inferred / Recommendation, each citing evidence IDs), covering the points above.
+
+## Synthesis
+
+If the experiment config declares a mediator role, the mediator runs after the reviewer, in its own working directory containing `findings.md`, `review.md`, `evidence-index.md`, `evidence/`, `artifacts/`, `agent-runbook.md`, and `experiment-brief.md`. The same restriction applies as for the reviewer: reasoning only from the recorded evidence and the two prior documents, no shell/code execution, no web search or fetch, no MCP tools.
+
+The mediator's job is to reconcile the executor's and reviewer's conclusions, not to referee a winner. Where the two disagree, surface the disagreement to the human with both sides' evidence cited rather than silently resolving it.
+
+The mediator produces `final-report.md` containing:
+
+- executive summary,
+- ground truth (success/failure) with confidence, noting whether executor and reviewer agree,
+- points of agreement between `findings.md` and `review.md`, cited,
+- points of disagreement between `findings.md` and `review.md`, cited from both sides, left unresolved rather than picked,
+- reconciled recommendations, cited,
+- open follow-up or escalation questions for the human reviewer.
+
+This is the document a human reviewer should read first; `findings.md` and `review.md` are its supporting record.
 
 ## Boundaries
 

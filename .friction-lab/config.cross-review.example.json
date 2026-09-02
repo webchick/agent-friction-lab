@@ -18,21 +18,36 @@
     {
       "id": "reviewer",
       "role": "reviewer",
-      "name": "Codex",
-      "command": "",
+      "name": "Claude Code (reviewer)",
+      "command": "claude",
       "mcpProvider": "none",
-      "required": false,
-      "notes": "External reviewer/lab-tech agent; not installed or configured inside the container by this profile."
+      "notes": "Runs headless (claude -p --restricted --strict-mcp-config) in an isolated working directory containing only the handoff artifacts. Swap 'command' for a different CLI agent if you want an external reviewer instead."
+    },
+    {
+      "id": "mediator",
+      "role": "mediator",
+      "name": "Claude Code (mediator)",
+      "command": "claude",
+      "mcpProvider": "none",
+      "notes": "Runs headless in an isolated working directory containing findings.md, review.md, and the evidence, and reconciles the two into final-report.md."
     }
   ],
   "reviewProtocol": {
     "mode": "cross-review",
-    "description": "The executor produces evidence and findings. The reviewer examines the evidence, challenges conclusions, and decides whether to return to the executor or escalate to the human.",
+    "description": "The executor produces evidence and findings. The reviewer independently examines the same evidence and produces its own findings. The mediator reconciles the two into a cited final report, surfacing disagreements rather than resolving them, before escalating to the human.",
+    "stages": ["executor", "reviewer", "mediator"],
     "handoffArtifacts": [
       "environment.md",
       "raw-log.md",
       "evidence-index.md",
       "findings.md",
+      "evidence/",
+      "artifacts/"
+    ],
+    "synthesisArtifacts": [
+      "findings.md",
+      "review.md",
+      "evidence-index.md",
       "evidence/",
       "artifacts/"
     ]
