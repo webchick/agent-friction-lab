@@ -82,7 +82,6 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - `reset-friction-lab-workspace.sh` - archive/remove run artifacts from the active workspace
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
 - `experiment-brief.md` - task-specific brief template to fill in for each experiment
-- `examples/pipeline-smoke-test/` - real, worked example of executor/reviewer/mediator output
 
 ## Basic Workflow
 
@@ -203,7 +202,7 @@ This is related to multi-agent debate, adversarial collaboration, and cross-exam
 
 Each stage's working artifacts live under `review/<timestamp>/`; `reset-friction-lab-workspace.sh` sweeps that directory along with the other run artifacts.
 
-See `examples/pipeline-smoke-test/` for real, unedited output from all three stages — including a deliberately planted evidence defect and how the reviewer and mediator handle it.
+A real, unedited worked example of all three stages' output — including a deliberately planted evidence defect and how the reviewer and mediator handle it — lives at [`examples/pipeline-smoke-test/`](https://github.com/webchick/agent-friction-lab/tree/examples/examples/pipeline-smoke-test) on the `examples` branch, not on `main`. Keeping it off `main` means a real experiment's `git clone` never puts a worked example in the executor's own workspace, which would otherwise hand a cold agent a template to pattern-match against instead of reasoning independently from `agent-runbook.md`.
 
 ## Baseline Bias
 
