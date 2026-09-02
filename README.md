@@ -20,7 +20,7 @@ Use this when you want to observe what happens when a relatively barebones codin
 ## Files
 
 - `.airlock/config.json` - experiment-specific tools, MCPs, and verifier settings
-- `.airlock/setup-airlock.sh` - applies MCP configuration inside the container
+- `.airlock/setup-airlock.sh` - installs configured packages/browsers and applies MCP configuration inside the container
 - `.devcontainer/` - disposable airlock container definition
 - `verify-airlock.sh` - automated preflight verification
 - `reset-airlock-workspace.sh` - archive/remove run artifacts from the active workspace
