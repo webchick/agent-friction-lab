@@ -4,9 +4,13 @@
     "npm",
     "git",
     "curl",
-    "jq",
-    "claude"
+    "jq"
   ],
+  "agent": {
+    "name": "none",
+    "command": "",
+    "mcpProvider": "none"
+  },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
   "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)|(^|/)\\.playwright-mcp(/|$)",

@@ -7,7 +7,7 @@ Use this when you want to observe what happens when a relatively barebones codin
 ## What It Provides
 
 - Debian Linux + Node.js
-- Claude Code
+- Config-selected agent/tooling installed at container creation
 - Config-selected MCP servers applied at container creation
 - Optional Playwright MCP and headless Chromium smoke test for browser-based experiments
 - Generic developer tools: `git`, `curl`, `jq`, `npm`
@@ -21,6 +21,7 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 - `.airlock/config.json` - tracked baseline tools, MCPs, and verifier settings
 - `.airlock/env.example` - template for local, untracked experiment-specific overrides
+- `.airlock/config.local.json` - optional ignored structured config for private experiments
 - `.airlock/setup-airlock.sh` - installs configured packages/browsers and applies MCP configuration inside the container
 - `.devcontainer/` - disposable airlock container definition
 - `verify-airlock.sh` - automated preflight verification
@@ -33,11 +34,12 @@ Use this when you want to observe what happens when a relatively barebones codin
 1. Copy or clone this harness into a new experiment workspace.
 2. Edit `experiment-brief.md` with the concrete task/outcome.
 3. For private or scenario-specific settings, copy `.airlock/env.example` to `.airlock/env` and edit `.airlock/env`. This file is ignored by Git.
-4. Rebuild/reopen the Dev Container.
-5. Run `./verify-airlock.sh`.
-6. Start the agent experiment only after the verifier passes.
-7. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
-8. Run `./reset-airlock-workspace.sh --yes` before the next airlock attempt.
+4. If the MCP/tool/package shape itself is private, copy `.airlock/config.json` to `.airlock/config.local.json`, edit that file, and set `AIRLOCK_CONFIG=.airlock/config.local.json` in `.airlock/env`.
+5. Rebuild/reopen the Dev Container.
+6. Run `./verify-airlock.sh`.
+7. Start the agent experiment only after the verifier passes.
+8. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
+9. Run `./reset-airlock-workspace.sh --yes` before the next airlock attempt.
 
 ## Optional Verification Settings
 
@@ -46,10 +48,15 @@ The verifier is intentionally generic. For reusable defaults, edit `.airlock/con
 ```json
 {
   "requiredCommands": ["node", "npm", "git", "curl", "jq", "claude"],
+  "agent": {
+    "name": "Claude Code",
+    "command": "claude",
+    "mcpProvider": "claude"
+  },
   "forbiddenCommands": ["example-cli"],
   "forbiddenEnvPattern": "EXAMPLE_VENDOR|ANOTHER_VENDOR",
   "allowedMcpServers": ["playwright"],
-  "npmGlobalPackages": ["playwright", "@playwright/mcp"],
+  "npmGlobalPackages": ["@anthropic-ai/claude-code", "playwright", "@playwright/mcp"],
   "playwrightBrowsers": ["chromium"],
   "playwrightMcpBrowsers": ["chrome-for-testing"],
   "mcpServers": [
@@ -67,16 +74,17 @@ The verifier is intentionally generic. For reusable defaults, edit `.airlock/con
 Local environment overrides are safer for private or scenario-specific runs. Copy `.airlock/env.example` to `.airlock/env`, then set values such as:
 
 ```sh
+AIRLOCK_CONFIG=.airlock/config.local.json
 AIRLOCK_FORBIDDEN_COMMANDS="example-cli another-cli"
 AIRLOCK_FORBIDDEN_ENV_PATTERN="EXAMPLE_VENDOR|ANOTHER_VENDOR"
 AIRLOCK_ALLOWED_MCP_SERVERS="playwright"
 ```
 
-`.airlock/env` is ignored by Git so local experiment details do not accidentally get committed to the public harness repo.
+`.airlock/env` and `.airlock/config.local.json` are ignored by Git so local experiment details do not accidentally get committed to the public harness repo.
 
-The sample config enables Playwright MCP because browser automation is a common experiment need. Remove it from `npmGlobalPackages`, `playwrightBrowsers`, `playwrightMcpBrowsers`, `mcpServers`, and `allowedMcpServers` for a shell-only airlock.
+The default config enables Claude Code plus Playwright MCP because browser automation is a common experiment need. Remove or replace the agent, package, browser, MCP, and allowed-server entries for a different agent or a shell-only airlock.
 
-A shell-only example is available at `.airlock/config.shell-only.example.json`.
+Examples are available at `.airlock/config.claude-playwright.example.json` and `.airlock/config.shell-only.example.json`.
 
 ## Resetting Between Runs
 

@@ -14,8 +14,4 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Claude Code is part of the baseline. Experiment-specific packages and MCP
-# exposure are controlled by .airlock/config.json during post-create setup.
-RUN npm install -g @anthropic-ai/claude-code
-
 USER node

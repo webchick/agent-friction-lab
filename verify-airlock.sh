@@ -28,6 +28,9 @@ allowed_mcp_servers="${AIRLOCK_ALLOWED_MCP_SERVERS:-$(read_json_array_words '.al
 forbidden_commands="${AIRLOCK_FORBIDDEN_COMMANDS:-$(read_json_array_words '.forbiddenCommands // []')}"
 forbidden_env_pattern="${AIRLOCK_FORBIDDEN_ENV_PATTERN:-$(jq -r '.forbiddenEnvPattern // ""' "$config_path")}"
 prior_trace_pattern="${AIRLOCK_PRIOR_TRACE_PATTERN:-$(jq -r '.priorTracePattern // ""' "$config_path")}"
+agent_name="$(jq -r '.agent.name // "unspecified"' "$config_path")"
+agent_command="$(jq -r '.agent.command // ""' "$config_path")"
+mcp_provider="$(jq -r '.agent.mcpProvider // "none"' "$config_path")"
 
 pass() {
   printf 'PASS: %s\n' "$1"
@@ -84,6 +87,7 @@ printf 'OS: %s\n' "$(uname -a)"
 printf 'CWD: %s\n' "$PWD"
 printf 'HOME: %s\n' "$HOME"
 printf 'Config: %s\n' "$config_path"
+printf 'Agent: %s\n' "$agent_name"
 printf '\n'
 
 if [ -r /etc/debian_version ]; then
@@ -113,10 +117,15 @@ else
   fail "npm does not run"
 fi
 
-if claude --version >/dev/null 2>&1; then
-  pass "Claude Code runs: $(claude --version)"
+if [ -n "$agent_command" ]; then
+  if command -v "$agent_command" >/dev/null 2>&1; then
+    version_output="$("$agent_command" --version 2>/dev/null | head -n 1 || true)"
+    pass "configured agent command runs: $agent_command${version_output:+ ($version_output)}"
+  else
+    fail "configured agent command is missing: $agent_command"
+  fi
 else
-  fail "Claude Code does not run"
+  pass "no configured agent command"
 fi
 
 if [ -n "$forbidden_commands" ]; then
@@ -140,8 +149,8 @@ if [ -d "$HOME/.ssh" ]; then
   else
     ssh_listing="$(find "$HOME/.ssh" -mindepth 1 -maxdepth 1 -print 2>/dev/null | sort || true)"
     if [ -n "$ssh_listing" ]; then
-    fail "\$HOME/.ssh exists and is not empty"
-    printf '%s\n' "$ssh_listing" >&2
+      fail "\$HOME/.ssh exists and is not empty"
+      printf '%s\n' "$ssh_listing" >&2
     else
       pass "\$HOME/.ssh exists but is empty"
     fi
@@ -203,35 +212,45 @@ else
   pass "no container-home agent skills directory exists"
 fi
 
-if [ -f "$HOME/.claude.json" ] || [ -d "$HOME/.claude" ]; then
-  claude_mcp_list="$(claude mcp list 2>&1 || true)"
-  printf 'Claude MCP list:\n%s\n\n' "$claude_mcp_list"
-  for expected_name in $allowed_mcp_servers; do
-    if printf '%s\n' "$claude_mcp_list" | grep -Eq "^${expected_name}:"; then
-      pass "Claude Code has expected MCP server configured: $expected_name"
+if [ "$mcp_provider" = "claude" ]; then
+  if ! command -v claude >/dev/null 2>&1; then
+    fail "Claude MCP provider configured, but claude command is missing"
+  elif [ -f "$HOME/.claude.json" ] || [ -d "$HOME/.claude" ]; then
+    claude_mcp_list="$(claude mcp list 2>&1 || true)"
+    printf 'Claude MCP list:\n%s\n\n' "$claude_mcp_list"
+    for expected_name in $allowed_mcp_servers; do
+      if printf '%s\n' "$claude_mcp_list" | grep -Eq "^${expected_name}:"; then
+        pass "Claude Code has expected MCP server configured: $expected_name"
+      else
+        fail "Claude Code does not list expected MCP server: $expected_name"
+      fi
+    done
+    mcp_names="$(printf '%s\n' "$claude_mcp_list" | sed -nE 's/^([[:alnum:]_.@/-]+):.*/\1/p' | sort -u)"
+    unexpected_mcp=""
+    for name in $mcp_names; do
+      case " $allowed_mcp_servers " in
+        *" $name "*) ;;
+        *) unexpected_mcp="${unexpected_mcp}${name}"$'\n' ;;
+      esac
+    done
+    if [ -n "$unexpected_mcp" ]; then
+      fail "Claude Code lists MCP/connectors outside AIRLOCK_ALLOWED_MCP_SERVERS"
+      printf '%s' "$unexpected_mcp" >&2
     else
-      fail "Claude Code does not list expected MCP server: $expected_name"
+      pass "Claude Code lists only allowed MCP/connectors: $allowed_mcp_servers"
     fi
-  done
-  mcp_names="$(printf '%s\n' "$claude_mcp_list" | sed -nE 's/^([[:alnum:]_.@/-]+):.*/\1/p' | sort -u)"
-  unexpected_mcp=""
-  for name in $mcp_names; do
-    case " $allowed_mcp_servers " in
-      *" $name "*) ;;
-      *) unexpected_mcp="${unexpected_mcp}${name}"$'\n' ;;
-    esac
-  done
-  if [ -n "$unexpected_mcp" ]; then
-    fail "Claude Code lists MCP/connectors outside AIRLOCK_ALLOWED_MCP_SERVERS"
-    printf '%s' "$unexpected_mcp" >&2
   else
-    pass "Claude Code lists only allowed MCP/connectors: $allowed_mcp_servers"
+    if [ -n "$allowed_mcp_servers" ]; then
+      fail "Claude Code configuration is absent; expected container-local MCP config"
+    else
+      pass "Claude Code configuration is absent and no MCP servers are expected"
+    fi
   fi
 else
   if [ -n "$allowed_mcp_servers" ]; then
-    fail "Claude Code configuration is absent; expected container-local MCP config"
+    fail "allowedMcpServers is set, but agent.mcpProvider is $mcp_provider"
   else
-    pass "Claude Code configuration is absent and no MCP servers are expected"
+    pass "no MCP provider configured"
   fi
 fi
 

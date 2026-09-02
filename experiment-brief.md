@@ -64,13 +64,18 @@ Examples:
 
 ## Preflight Additions
 
-Set experiment-specific airlock checks here. Prefer local overrides in `.airlock/env` for private or scenario-specific values; that file is ignored by Git. Use `.airlock/config.json` for reusable defaults that should be committed.
+Set experiment-specific airlock checks here. Prefer local overrides in `.airlock/env` for private or scenario-specific values; that file is ignored by Git. If the structured MCP/tool configuration is private, use an ignored `.airlock/config.local.json` and set `AIRLOCK_CONFIG=.airlock/config.local.json` in `.airlock/env`. Use `.airlock/config.json` for reusable defaults that should be committed.
 
 Suggested config fields:
 
 ```json
 {
   "requiredCommands": ["node", "npm", "git", "curl", "jq", "claude"],
+  "agent": {
+    "name": "Claude Code",
+    "command": "claude",
+    "mcpProvider": "claude"
+  },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",
   "priorTracePattern": "(^|/)(environment|evidence-index|raw-log|findings)\\.md$|(^|/)(evidence|artifacts)(/|$)",
