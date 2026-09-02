@@ -221,7 +221,7 @@ else
   pass "no host-backed mounts other than the project workspace are visible"
 fi
 
-if [ -e /hosthome ] || [ -e /Users/webchick ] || [ -e /Users ]; then
+if [ -e /hosthome ] || [ -e /Users ]; then
   fail "host home path appears mounted or visible"
 else
   pass "host home path is not visible"
