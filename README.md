@@ -86,6 +86,12 @@ The default config enables Claude Code plus Playwright MCP because browser autom
 
 Examples are available at `.airlock/config.claude-playwright.example.json` and `.airlock/config.shell-only.example.json`.
 
+## Baseline Bias
+
+The default Dev Container includes Node.js because the sample agent and MCP tooling are installed through npm. Treat that as harness plumbing, not as a claim that JavaScript is part of every fair target baseline.
+
+This distinction can still matter. Node/npm availability may advantage JavaScript-native targets, just as adding PHP, Python, Composer, or other ecosystem tools may advantage their native stacks. For comparative experiments, document which tools are required for the harness, which tools are deliberately provided for the target task, and which tools are merely incidental to the base image.
+
 ## Resetting Between Runs
 
 Dry run:

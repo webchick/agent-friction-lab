@@ -36,6 +36,12 @@ Examples:
 - generic developer tooling available,
 - browser automation available from the beginning.
 
+Also classify baseline tooling:
+
+- harness-required tools,
+- deliberately provided target-task tools,
+- incidental tools present in the base image.
+
 ## Allowed Resources
 
 State what the agent may use.
