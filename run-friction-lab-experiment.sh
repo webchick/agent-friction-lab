@@ -7,7 +7,8 @@ Usage: ./run-friction-lab-experiment.sh [execute|review|synthesize|all] [--unatt
 
 Runs the executor/reviewer/mediator pipeline declared in the resolved
 friction lab config (.friction-lab/config.local.json if present, else
-.friction-lab/config.json, or $FRICTION_LAB_CONFIG).
+.friction-lab/config.json, or $FRICTION_LAB_CONFIG) against the resolved
+brief (experiment-brief.local.md if present, else experiment-brief.md).
 
   execute      Run the executor agent, producing findings.md and the rest of
                the evidence chain. Skipped if findings.md already exists.
@@ -40,6 +41,17 @@ fi
 
 if [ ! -f "$config_path" ]; then
   printf 'Agent Friction Lab config not found: %s\n' "$config_path" >&2
+  exit 1
+fi
+
+if [ -f "experiment-brief.local.md" ]; then
+  brief_path="experiment-brief.local.md"
+else
+  brief_path="experiment-brief.md"
+fi
+
+if [ ! -f "$brief_path" ]; then
+  printf 'Agent Friction Lab brief not found: %s\n' "$brief_path" >&2
   exit 1
 fi
 
@@ -97,14 +109,14 @@ run_executor() {
   if [ "$unattended" -ne 1 ]; then
     printf 'findings.md not found, and the --unattended flag was not passed.\n' >&2
     printf 'Either drive the executor interactively yourself (start %s and follow\n' "$executor_command" >&2
-    printf 'agent-runbook.md + experiment-brief.md), or re-run this command and pass\n' >&2
+    printf 'agent-runbook.md + %s), or re-run this command and pass\n' "$brief_path" >&2
     printf 'the --unattended flag for a headless, full-tool-access executor run.\n' >&2
     exit 1
   fi
 
   printf 'Running executor (%s) headlessly with full tool access...\n' "$executor_command"
   "$executor_command" -p --dangerously-skip-permissions "${budget_args[@]}" \
-    "You are the executor agent for this Agent Friction Lab run. Read ./agent-runbook.md and ./experiment-brief.md in this directory and follow them exactly, starting with Preflight. Do not skip Preflight. Produce every required artifact (environment.md, raw-log.md, evidence-index.md, findings.md, evidence/, artifacts/) before finishing."
+    "You are the executor agent for this Agent Friction Lab run. Read ./agent-runbook.md and ./$brief_path in this directory and follow them exactly, starting with Preflight. Do not skip Preflight. Produce every required artifact (environment.md, raw-log.md, evidence-index.md, findings.md, evidence/, artifacts/) before finishing."
 
   if [ ! -f findings.md ]; then
     printf 'Executor run finished but findings.md was not produced.\n' >&2
@@ -135,7 +147,8 @@ run_reviewer() {
   local timestamp run_dir
   timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
   run_dir="review/$timestamp/inbox"
-  copy_artifacts "$run_dir" "${handoff_artifacts[@]}" agent-runbook.md experiment-brief.md
+  copy_artifacts "$run_dir" "${handoff_artifacts[@]}" agent-runbook.md
+  cp "$brief_path" "$run_dir/experiment-brief.md"
 
   printf 'Running reviewer (%s) in isolated directory %s...\n' "$reviewer_command" "$run_dir"
   (
@@ -174,7 +187,8 @@ run_mediator() {
   local timestamp run_dir
   timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
   run_dir="review/$timestamp/synthesis"
-  copy_artifacts "$run_dir" "${synthesis_artifacts[@]}" agent-runbook.md experiment-brief.md
+  copy_artifacts "$run_dir" "${synthesis_artifacts[@]}" agent-runbook.md
+  cp "$brief_path" "$run_dir/experiment-brief.md"
 
   printf 'Running mediator (%s) in isolated directory %s...\n' "$mediator_command" "$run_dir"
   (

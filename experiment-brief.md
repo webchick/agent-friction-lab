@@ -2,6 +2,11 @@
 
 Fill this file in for a specific friction lab agent experiment.
 
+For a real run, copy this to `experiment-brief.local.md` and edit that instead —
+it's gitignored and automatically preferred over this file when present, so a real
+target's name and strategy can't end up committed to this public repo. Use this
+tracked file only for a reusable, non-sensitive default brief.
+
 ## Reason
 
 Why are we running this experiment? What assumption, workflow, product experience, or agent-readiness question are we trying to understand?

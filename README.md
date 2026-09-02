@@ -81,12 +81,13 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - `run-friction-lab-experiment.sh` - runs the executor/reviewer/mediator pipeline
 - `reset-friction-lab-workspace.sh` - archive/remove run artifacts from the active workspace
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
-- `experiment-brief.md` - task-specific brief template to fill in for each experiment
+- `experiment-brief.md` - reusable, non-sensitive brief template
+- `experiment-brief.local.md` - optional ignored real brief; automatically used when present
 
 ## Basic Workflow
 
 1. Copy or clone this harness into a new experiment workspace.
-2. Edit `experiment-brief.md` with the concrete task/outcome.
+2. Copy `experiment-brief.md` to `experiment-brief.local.md` and edit the local file with the concrete task/outcome.
 3. Copy `.friction-lab/config.json` to `.friction-lab/config.local.json` and edit the local file for the experiment.
 4. Restart the disposable Dev Container so the local config is applied.
 5. Run `./verify-friction-lab.sh`.
@@ -95,6 +96,8 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 8. Run `./reset-friction-lab-workspace.sh --yes` before the next friction lab attempt.
 
 `.friction-lab/config.local.json` is ignored by Git and automatically preferred by setup and verification when it exists. Use it for all scenario-specific tool, MCP, package, forbidden-command, and forbidden-environment settings, even if they do not seem private yet.
+
+`experiment-brief.local.md` gets the same treatment: ignored by Git, automatically preferred by `run-friction-lab-experiment.sh` when it exists. A real target's name and identity strategy shouldn't land in this public repo's history, so use the local file for any real run and leave `experiment-brief.md` as the reusable, non-sensitive template.
 
 Use `.friction-lab/env` only for advanced overrides that are easier as shell values, such as `FRICTION_LAB_ARCHIVE_ROOT` or temporarily pointing `FRICTION_LAB_CONFIG` at a differently named file.
 

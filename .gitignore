@@ -2,6 +2,7 @@
 .friction-lab/env
 .friction-lab/config.local.json
 .friction-lab/config.*.local.json
+experiment-brief.local.md
 .playwright-mcp/
 environment.md
 raw-log.md
