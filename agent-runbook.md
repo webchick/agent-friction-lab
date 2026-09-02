@@ -19,6 +19,8 @@ The environment should begin with:
 
 Connectors (Gmail, Google Calendar, Google Drive, and similar first-party integrations) are tied to the authenticated account, not to container/filesystem state — rebuilding the container does not remove them if the agent authenticates as the same account each time. The devcontainer sets `ENABLE_CLAUDEAI_MCP_SERVERS=false` to prevent them from loading at all for a Claude Code executor, but check for them explicitly anyway (`claude mcp list` or the equivalent for the configured agent), not just for locally-configured MCP servers — this is a real environment defect, not a hypothetical one, found during this harness's own validation, and the check should not depend solely on that one setting continuing to be present and effective. Account-level access to a real inbox or drive can materially change how much real-world friction a task actually has (e.g. reading a signup verification email directly instead of experiencing that step as friction).
 
+If the sandbox or permission system blocks a direct manual check of one of these facts (for example, denying a raw read of `~/.ssh` or `~/.claude.json`), it's fine to rely on `./verify-friction-lab.sh`'s own already-authorized check of the same fact instead of repeatedly retrying a blocked command — but record in `raw-log.md` that this happened and why, rather than silently treating a denied check as equivalent to one you actually performed yourself.
+
 The exact allowed MCP servers, extra required commands, forbidden commands, forbidden environment patterns, and prior-run trace patterns are declared in `.friction-lab/config.json`.
 
 The model's stock training knowledge is allowed and is part of the real-world test. Treat this as a cold-context and cold-environment test, not a literal test of zero prior model knowledge.
@@ -63,6 +65,8 @@ Maintain a neutral `evidence-index.md` with, for each evidence item:
 
 Do not put conclusions, severity ratings, or recommendations into `evidence-index.md`.
 
+Assign an ID to every artifact the findings actually rely on, not just a representative subset — an unindexed screenshot in `artifacts/` that the narrative leans on is exactly as unverifiable to a reviewer as a claim with no evidence ID at all. Before finalizing `evidence-index.md`, re-open each image/file and confirm its content actually matches its filename and description — a mislabeled screenshot is worse than no screenshot, since it looks verified when it isn't.
+
 ### Claim-to-Evidence Traceability
 
 Every material factual claim in `findings.md` must cite one or more evidence IDs.
@@ -85,6 +89,8 @@ Maintain `raw-log.md` as a chronological lab notebook containing:
 - referenced evidence IDs.
 
 Keep rationale and interpretation separate from raw evidence when possible.
+
+When recording a form fill or similar structured input, log every field actually entered, including ones that seem incidental — a field that's visible in a screenshot but absent from the log breaks traceability for exactly that detail if it later turns out to matter.
 
 For mutating commands or state changes whose behavior is ambiguous, capture enough before/after state to determine whether a partial side effect occurred.
 
@@ -175,6 +181,10 @@ Follow the task-specific brief. Unless explicitly allowed there, do not:
 - import target credentials/configuration from the host,
 - import or read prior experiment findings/traces during the run,
 - add target-specific agent skills/MCPs/plugins merely to advantage one target over another unless the experiment explicitly authorizes that comparison.
+
+"Circumvent" applies to the outcome, not the technique. An anti-abuse check like CAPTCHA exists to gate an action behind proof of non-automation, so an automated system passing it counts as circumvention regardless of whether the specific means was a technical exploit, fingerprint evasion, a third-party solving service, or the agent's own vision solving the puzzle as shown — the technique doesn't change the category of outcome. Do not attempt any of these by default; record the block and RETURN. If a specific experiment's brief explicitly authorizes attempting a visible interactive challenge as the deliberate subject of that experiment (an `Allowed Resources` entry decided up front, not an in-the-moment RETURN choice), that authorization governs instead.
+
+Creating a new account with a third-party identity provider (GitHub, Google, or similar) is out of scope by default alongside using the operator's own credentials, even a fresh account with no operator-identifying information. This isn't about misrepresenting identity — it's that doing so requires autonomously accepting that provider's own terms of service and standing up a persistent account relationship with a second company, a materially bigger and more consequential act than something like a disposable email inbox, which is receive-only and creates no account or ToS relationship at all. A disposable email is fine under the "no operator credentials" item above; a disposable OAuth account is not, unless the experiment's brief explicitly authorizes provisioning one as part of its baseline.
 
 ## Timing
 

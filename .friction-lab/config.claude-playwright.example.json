@@ -41,7 +41,8 @@
       "findings.md",
       "evidence/",
       "artifacts/",
-      "runs/"
+      "runs/",
+      "docs/branching-design.md"
     ],
     "synthesisArtifacts": [
       "environment.md",
@@ -51,7 +52,8 @@
       "evidence-index.md",
       "evidence/",
       "artifacts/",
-      "runs/"
+      "runs/",
+      "docs/branching-design.md"
     ]
   },
   "forbiddenCommands": [],
