@@ -4,6 +4,18 @@ Reusable Dev Container harness for friction lab agent-readiness experiments.
 
 Use this when you want to observe what happens when a relatively barebones coding agent tries to accomplish a task from a cold workspace and a generic developer environment.
 
+## Fastest Path
+
+If you already have a checkout with Docker available, the whole flow — reset, config, brief, container, verify, executor, review, synthesis, results — is one command:
+
+```bash
+./run-experiment.sh "Sign up for a free trial of Contentful and publish a first content entry."
+```
+
+The executor stage opens as an interactive session for you to watch and drive (it's the one stage of this pipeline not validated running unattended); everything else runs automatically. See `./run-experiment.sh --help` for the `--budget` and `--force` flags.
+
+The rest of this README documents the steps that command runs for you — read on if you want staged control, are setting up a checkout for the first time, or are troubleshooting.
+
 ## Quickstart
 
 You need Docker. This walks through the terminal path; see [Prefer VS Code?](#prefer-vs-code) below for the GUI equivalent.
@@ -78,7 +90,8 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - `.friction-lab/setup-friction-lab.sh` - installs configured packages/browsers and applies MCP configuration inside the container
 - `.devcontainer/` - disposable friction lab container definition
 - `verify-friction-lab.sh` - automated preflight verification
-- `run-friction-lab-experiment.sh` - runs the executor/reviewer/mediator pipeline
+- `run-experiment.sh` - one-command zero-ceremony entry point (setup through results)
+- `run-friction-lab-experiment.sh` - runs the executor/reviewer/mediator pipeline (container-level, staged control)
 - `reset-friction-lab-workspace.sh` - archive/remove run artifacts from the active workspace
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
 - `experiment-brief.md` - reusable, non-sensitive brief template
