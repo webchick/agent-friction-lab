@@ -82,6 +82,7 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - `reset-friction-lab-workspace.sh` - archive/remove run artifacts from the active workspace
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
 - `experiment-brief.md` - task-specific brief template to fill in for each experiment
+- `examples/pipeline-smoke-test/` - real, worked example of executor/reviewer/mediator output
 
 ## Basic Workflow
 
@@ -201,6 +202,8 @@ This is related to multi-agent debate, adversarial collaboration, and cross-exam
 `execute` only launches Claude Code headlessly with full tool access if you pass `--unattended`; otherwise, if `findings.md` is missing, it stops and tells you to either drive the executor interactively yourself (as documented above) or re-run with `--unattended`. This keeps unattended full-tool-access runs an explicit choice rather than a script default. `review` and `synthesize` always run headless and isolated, since they only need read access to already-captured evidence.
 
 Each stage's working artifacts live under `review/<timestamp>/`; `reset-friction-lab-workspace.sh` sweeps that directory along with the other run artifacts.
+
+See `examples/pipeline-smoke-test/` for real, unedited output from all three stages — including a deliberately planted evidence defect and how the reviewer and mediator handle it.
 
 ## Baseline Bias
 

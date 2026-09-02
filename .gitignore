@@ -13,3 +13,7 @@ evidence/
 artifacts/
 runs/
 review/
+
+# Worked example is real pipeline output, deliberately committed despite the
+# patterns above matching its filenames.
+!examples/pipeline-smoke-test/**
