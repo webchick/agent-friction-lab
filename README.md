@@ -93,11 +93,12 @@ Everything past this point — the scripts, the pipeline, the evidence files —
 - `verify-friction-lab.sh` - automated preflight verification
 - `run-experiment.sh` - one-command zero-ceremony entry point (setup through results)
 - `run-friction-lab-experiment.sh` - runs the executor/reviewer/mediator pipeline (container-level, staged control)
+- `branch-experiment.sh` - seals the current attempt and continues under a RETURN-authorized capability
 - `reset-friction-lab-workspace.sh` - archive/remove run artifacts from the active workspace
 - `agent-runbook.md` - reusable meta-prompt for agents running experiments
 - `experiment-brief.md` - reusable, non-sensitive brief template
 - `experiment-brief.local.md` - optional ignored real brief; automatically used when present
-- `docs/branching-design.md` - design doc for RETURN-triggered branching (not yet implemented)
+- `docs/branching-design.md` - design doc for RETURN-triggered branching
 
 ## Basic Workflow
 

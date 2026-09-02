@@ -1,10 +1,15 @@
 # Branching: barebones by default, escalate on RETURN, preserve every attempt
 
-**Status: design only, not yet implemented.** Part (A) below (the barebones-default
-config change) is implemented and live. `branch-experiment.sh` and the RETURN/raw-log
-runbook changes ((B) and (C)) are deferred pending a real RETURN to design against —
-see Sequencing. Nothing described here beyond (A) exists in the harness yet; treat
-the rest as a plan, not documentation of current behavior.
+**Status: implemented.** All three parts shipped: (A) the barebones-default config
+change, (B) `branch-experiment.sh`, and (C) the RETURN/raw-log runbook changes. (B)
+and (C) were built after, and grounded in, a real full validation run (a Contentful
+signup attempt that hit a genuine hCaptcha/OAuth-account RETURN and correctly
+resulted in STOP) — see that run's `raw-log.md`/`findings.md`/`review.md`/
+`final-report.md` for the concrete case this design was checked against. The branch
+mechanics themselves (`branch-experiment.sh`'s sealing/numbering/parent-detection)
+are dry-run tested but have not yet been exercised by a real BRANCH outcome, since
+the validation run resulted in STOP — worth treating BRANCH as less proven than STOP
+until a real run actually exercises it.
 
 ## Context
 
@@ -139,14 +144,12 @@ This design bundles three separable pieces:
   simplified. Low-risk, immediately valuable on its own even with no branching
   mechanism yet — every run from here on measures the true barebones default.
 - **(B) + (C) `branch-experiment.sh` and the RETURN/raw-log runbook changes** —
-  deferred. This is the least-validated design in the whole harness so far: built
-  from one historical anecdote plus one design conversation, no prototype exercised
-  yet. This doc preserves the design without committing to the mechanics being
-  exactly right. Build it once a real RETURN happens against the new barebones
-  default and there's an actual blocker to design against, rather than trusting
-  paper design here.
+  shipped, after waiting for the real RETURN this doc's original Sequencing section
+  said to wait for. That run resulted in STOP, not BRANCH, so the sealing/numbering
+  mechanics themselves are dry-run tested but not yet exercised by a real branch —
+  worth confirming with a real BRANCH outcome before treating them as fully proven.
 
-## Verification (for (B) + (C), once built)
+## Verification (for (B) + (C))
 
 - `bash -n branch-experiment.sh`; `jq empty` on any config files it touches.
 - Scratch dry-run of `branch-experiment.sh` against synthetic evidence files:

@@ -214,7 +214,14 @@ When escalating, report:
 5. how you classify the blocker: target, harness, environment, agent route choice, human authority, or unknown,
 6. the smallest specific thing needed from the human to proceed.
 
-After receiving help, continue autonomously unless another RETURN condition occurs.
+The human's response to a RETURN is one of two outcomes:
+
+- **STOP**: the blocked state is the final result for this attempt. Do not branch, do not try further workarounds. Proceed directly to the Final Deliverable below — the block itself is the finding.
+- **BRANCH**: the human authorizes a specific, named capability or config change to get past the blocker. Run `./branch-experiment.sh <slug> "<blocker>" "<authorization>"` to seal the current attempt as its own standalone record before anything changes. Then apply the authorized change deterministically rather than from recall — copy the relevant `mcpServers` entry verbatim from the matching `.friction-lab/config.*.example.json` into `.friction-lab/config.local.json`, then run the same registration command that entry specifies, so the config and the live tool state never drift apart. Write the marker line printed by `branch-experiment.sh` (`=== BRANCH: <slug> (runs/<NNN>-<slug>/) ===`) into `raw-log.md` immediately, before continuing, so anyone reading the log later can see exactly where the fork happened without cross-referencing `runs/` separately. Continue the same task attempt from there — normal RETURN rules (try substantially different approaches, escalate again if another blocker appears) still apply afterward.
+
+A branch only ever *adds* an authorized capability. It is never a route around a hard Boundary — CAPTCHA, identity verification, payment, credentials stay absolute regardless of how many times a run has branched. If what's actually being asked for at a RETURN point would cross a Boundary, that's a STOP question ("should this Boundary apply here"), not a BRANCH question ("what tool would help").
+
+If the experiment ends with one or more branches, `findings.md`'s Final Deliverable (below) must summarize the branch lineage: what blocked each attempt, what was authorized, and a pointer to `runs/` for the full frozen record of each prior attempt. That's what makes "did this target need more than barebones" legible to a human reader without them digging through `runs/` themselves.
 
 ## Final Deliverable
 
@@ -231,5 +238,6 @@ After completing the task attempt, produce `findings.md` with:
 - human interventions,
 - important documentation/resources discovered,
 - untested alternative routes,
+- branch lineage if any branches occurred (what blocked each attempt, what was authorized, pointer to `runs/` for each prior attempt's frozen record),
 - evidence IDs for all material factual claims,
 - confidence stated separately for success/failure ground truth, friction attribution, comparisons, and major recommendations.

@@ -21,7 +21,9 @@ baseline_paths=(
   "verify-friction-lab.sh"
   "run-friction-lab-experiment.sh"
   "run-experiment.sh"
+  "branch-experiment.sh"
   "reset-friction-lab-workspace.sh"
+  "docs"
 )
 
 cruft_paths=(
@@ -54,7 +56,9 @@ The baseline harness files are left in place:
   verify-friction-lab.sh
   run-friction-lab-experiment.sh
   run-experiment.sh
+  branch-experiment.sh
   reset-friction-lab-workspace.sh
+  docs/
 
 Set FRICTION_LAB_ARCHIVE_ROOT to choose a different archive location.
 EOF
