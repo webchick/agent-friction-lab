@@ -1,4 +1,5 @@
 .DS_Store
+.airlock/env
 .playwright-mcp/
 environment.md
 raw-log.md

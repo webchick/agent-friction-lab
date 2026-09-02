@@ -19,7 +19,8 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 ## Files
 
-- `.airlock/config.json` - experiment-specific tools, MCPs, and verifier settings
+- `.airlock/config.json` - tracked baseline tools, MCPs, and verifier settings
+- `.airlock/env.example` - template for local, untracked experiment-specific overrides
 - `.airlock/setup-airlock.sh` - installs configured packages/browsers and applies MCP configuration inside the container
 - `.devcontainer/` - disposable airlock container definition
 - `verify-airlock.sh` - automated preflight verification
@@ -31,15 +32,16 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 1. Copy or clone this harness into a new experiment workspace.
 2. Edit `experiment-brief.md` with the concrete task/outcome.
-3. Rebuild/reopen the Dev Container.
-4. Run `./verify-airlock.sh`.
-5. Start the agent experiment only after the verifier passes.
-6. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
-7. Run `./reset-airlock-workspace.sh --yes` before the next airlock attempt.
+3. For private or scenario-specific settings, copy `.airlock/env.example` to `.airlock/env` and edit `.airlock/env`. This file is ignored by Git.
+4. Rebuild/reopen the Dev Container.
+5. Run `./verify-airlock.sh`.
+6. Start the agent experiment only after the verifier passes.
+7. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
+8. Run `./reset-airlock-workspace.sh --yes` before the next airlock attempt.
 
 ## Optional Verification Settings
 
-The verifier is intentionally generic. For a particular experiment, edit `.airlock/config.json`:
+The verifier is intentionally generic. For reusable defaults, edit `.airlock/config.json`:
 
 ```json
 {
@@ -62,13 +64,15 @@ The verifier is intentionally generic. For a particular experiment, edit `.airlo
 }
 ```
 
-Environment variables can override config values for one-off runs:
+Local environment overrides are safer for private or scenario-specific runs. Copy `.airlock/env.example` to `.airlock/env`, then set values such as:
 
-```bash
-AIRLOCK_FORBIDDEN_COMMANDS="example-cli another-cli" ./verify-airlock.sh
-AIRLOCK_FORBIDDEN_ENV_PATTERN="EXAMPLE_VENDOR|ANOTHER_VENDOR" ./verify-airlock.sh
-AIRLOCK_ALLOWED_MCP_SERVERS="playwright" ./verify-airlock.sh
+```sh
+AIRLOCK_FORBIDDEN_COMMANDS="example-cli another-cli"
+AIRLOCK_FORBIDDEN_ENV_PATTERN="EXAMPLE_VENDOR|ANOTHER_VENDOR"
+AIRLOCK_ALLOWED_MCP_SERVERS="playwright"
 ```
+
+`.airlock/env` is ignored by Git so local experiment details do not accidentally get committed to the public harness repo.
 
 The sample config enables Playwright MCP because browser automation is a common experiment need. Remove it from `npmGlobalPackages`, `playwrightBrowsers`, `playwrightMcpBrowsers`, `mcpServers`, and `allowedMcpServers` for a shell-only airlock.
 

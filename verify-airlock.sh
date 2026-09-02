@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+if [ -f ".airlock/env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ".airlock/env"
+  set +a
+fi
+
 failures=0
 
 config_path="${AIRLOCK_CONFIG:-.airlock/config.json}"

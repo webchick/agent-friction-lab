@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+if [ -f ".airlock/env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ".airlock/env"
+  set +a
+fi
+
 config_path="${AIRLOCK_CONFIG:-.airlock/config.json}"
 npm_global_bin="$(npm prefix -g)/bin"
 setup_path="$npm_global_bin:$PATH"

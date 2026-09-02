@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+if [ -f ".airlock/env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ".airlock/env"
+  set +a
+fi
+
 archive_root="${AIRLOCK_ARCHIVE_ROOT:-/private/tmp/agent-airlock-archives}"
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 archive_dir="$archive_root/$timestamp"

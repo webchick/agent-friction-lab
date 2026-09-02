@@ -64,7 +64,7 @@ Examples:
 
 ## Preflight Additions
 
-Set experiment-specific airlock checks here. Prefer editing `.airlock/config.json` so setup and verification use the same source of truth.
+Set experiment-specific airlock checks here. Prefer local overrides in `.airlock/env` for private or scenario-specific values; that file is ignored by Git. Use `.airlock/config.json` for reusable defaults that should be committed.
 
 Suggested config fields:
 
@@ -82,9 +82,9 @@ Suggested config fields:
 }
 ```
 
-Optional one-off shell overrides:
+Optional local `.airlock/env` overrides:
 
-```bash
+```sh
 export AIRLOCK_FORBIDDEN_COMMANDS=""
 export AIRLOCK_FORBIDDEN_ENV_PATTERN=""
 export AIRLOCK_PRIOR_TRACE_PATTERN=""
