@@ -70,7 +70,7 @@ Examples:
 
 ## Preflight Additions
 
-Set experiment-specific airlock checks here. Prefer local overrides in `.airlock/env` for private or scenario-specific values; that file is ignored by Git. If the structured MCP/tool configuration is private, use an ignored `.airlock/config.local.json` and set `AIRLOCK_CONFIG=.airlock/config.local.json` in `.airlock/env`. Use `.airlock/config.json` for reusable defaults that should be committed.
+Set experiment-specific airlock checks here. Put scenario-specific values in `.airlock/config.local.json`; that file is ignored by Git and is automatically preferred by setup and verification when it exists. Use `.airlock/config.json` only for reusable defaults that should be committed.
 
 Suggested config fields:
 
@@ -93,14 +93,11 @@ Suggested config fields:
 }
 ```
 
-Optional local `.airlock/env` overrides:
+Optional local `.airlock/env` overrides for temporary shell values:
 
 ```sh
-export AIRLOCK_FORBIDDEN_COMMANDS=""
-export AIRLOCK_FORBIDDEN_ENV_PATTERN=""
-export AIRLOCK_PRIOR_TRACE_PATTERN=""
-export AIRLOCK_ALLOWED_MCP_SERVERS="playwright"
-./verify-airlock.sh
+AIRLOCK_ARCHIVE_ROOT=/path/to/durable/archive
+AIRLOCK_CONFIG=.airlock/some-other-local-profile.json
 ```
 
 ## Tests

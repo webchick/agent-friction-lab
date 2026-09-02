@@ -8,7 +8,13 @@ if [ -f ".airlock/env" ]; then
   set +a
 fi
 
-config_path="${AIRLOCK_CONFIG:-.airlock/config.json}"
+if [ -n "${AIRLOCK_CONFIG:-}" ]; then
+  config_path="$AIRLOCK_CONFIG"
+elif [ -f ".airlock/config.local.json" ]; then
+  config_path=".airlock/config.local.json"
+else
+  config_path=".airlock/config.json"
+fi
 npm_global_bin="$(npm prefix -g)/bin"
 setup_path="$npm_global_bin:$PATH"
 

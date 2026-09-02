@@ -10,7 +10,13 @@ fi
 
 failures=0
 
-config_path="${AIRLOCK_CONFIG:-.airlock/config.json}"
+if [ -n "${AIRLOCK_CONFIG:-}" ]; then
+  config_path="$AIRLOCK_CONFIG"
+elif [ -f ".airlock/config.local.json" ]; then
+  config_path=".airlock/config.local.json"
+else
+  config_path=".airlock/config.json"
+fi
 
 if [ ! -f "$config_path" ]; then
   printf 'FAIL: airlock config not found: %s\n' "$config_path" >&2

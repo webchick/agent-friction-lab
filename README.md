@@ -12,16 +12,16 @@ Use this when you want to observe what happens when a relatively barebones codin
 - Optional Playwright MCP and headless Chromium smoke test for browser-based experiments
 - Generic developer tools: `git`, `curl`, `jq`, `npm`
 - No host home mount, host SSH keys, host Claude config, platform credentials, or platform-specific MCPs/skills
-- Experiment-specific MCP servers and checks declared in `.airlock/config.json`
+- Experiment-specific MCP servers and checks declared in ignored local config
 - A verifier script that fails loudly when the airlock assumptions are violated
 - A reset script that moves run artifacts out of the active workspace
 - A reusable experiment runbook for evidence, logs, findings, and RETURN behavior
 
 ## Files
 
-- `.airlock/config.json` - tracked baseline tools, MCPs, and verifier settings
-- `.airlock/env.example` - template for local, untracked experiment-specific overrides
-- `.airlock/config.local.json` - optional ignored structured config for private experiments
+- `.airlock/config.json` - tracked default profile and reusable example settings
+- `.airlock/config.local.json` - optional ignored experiment profile; automatically used when present
+- `.airlock/env.example` - template for advanced local environment overrides
 - `.airlock/setup-airlock.sh` - installs configured packages/browsers and applies MCP configuration inside the container
 - `.devcontainer/` - disposable airlock container definition
 - `verify-airlock.sh` - automated preflight verification
@@ -33,17 +33,20 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 1. Copy or clone this harness into a new experiment workspace.
 2. Edit `experiment-brief.md` with the concrete task/outcome.
-3. For private or scenario-specific settings, copy `.airlock/env.example` to `.airlock/env` and edit `.airlock/env`. This file is ignored by Git.
-4. If the MCP/tool/package shape itself is private, copy `.airlock/config.json` to `.airlock/config.local.json`, edit that file, and set `AIRLOCK_CONFIG=.airlock/config.local.json` in `.airlock/env`.
-5. Rebuild/reopen the Dev Container.
-6. Run `./verify-airlock.sh`.
-7. Start the agent experiment only after the verifier passes.
-8. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
-9. Run `./reset-airlock-workspace.sh --yes` before the next airlock attempt.
+3. Copy `.airlock/config.json` to `.airlock/config.local.json` and edit the local file for the experiment.
+4. Rebuild/reopen the Dev Container.
+5. Run `./verify-airlock.sh`.
+6. Start the agent experiment only after the verifier passes.
+7. Preserve `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` after each run.
+8. Run `./reset-airlock-workspace.sh --yes` before the next airlock attempt.
+
+`.airlock/config.local.json` is ignored by Git and automatically preferred by setup and verification when it exists. Use it for all scenario-specific tool, MCP, package, forbidden-command, and forbidden-environment settings, even if they do not seem private yet.
+
+Use `.airlock/env` only for advanced overrides that are easier as shell values, such as `AIRLOCK_ARCHIVE_ROOT` or temporarily pointing `AIRLOCK_CONFIG` at a differently named file.
 
 ## Optional Verification Settings
 
-The verifier is intentionally generic. For reusable defaults, edit `.airlock/config.json`:
+The verifier is intentionally generic. For each experiment, edit `.airlock/config.local.json`:
 
 ```json
 {
@@ -71,10 +74,10 @@ The verifier is intentionally generic. For reusable defaults, edit `.airlock/con
 }
 ```
 
-Local environment overrides are safer for private or scenario-specific runs. Copy `.airlock/env.example` to `.airlock/env`, then set values such as:
+Optional environment overrides are available for local shell-only tweaks. Copy `.airlock/env.example` to `.airlock/env`, then set values such as:
 
 ```sh
-AIRLOCK_CONFIG=.airlock/config.local.json
+AIRLOCK_ARCHIVE_ROOT=/path/to/durable/archive
 AIRLOCK_FORBIDDEN_COMMANDS="example-cli another-cli"
 AIRLOCK_FORBIDDEN_ENV_PATTERN="EXAMPLE_VENDOR|ANOTHER_VENDOR"
 AIRLOCK_ALLOWED_MCP_SERVERS="playwright"
