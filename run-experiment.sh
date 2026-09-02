@@ -130,9 +130,10 @@ printf '\n===== Verifying the environment =====\n'
 devcontainer exec --workspace-folder . bash -c "./verify-friction-lab.sh"
 
 printf '\n===== Executor: interactive session =====\n'
-printf 'Watch what it does. Exit (Ctrl-D or /exit) once it finishes or RETURNs.\n\n'
+printf 'Watch what it does. When it finishes or RETURNs, type /exit (or Ctrl-D) to\n'
+printf 'close this session -- review and synthesis run automatically right after.\n\n'
 devcontainer exec --workspace-folder . "${remote_env_args[@]}" claude \
-  "You are the executor agent for this Agent Friction Lab run. Read ./agent-runbook.md and ./experiment-brief.local.md in this directory and follow them exactly, starting with Preflight. Do not skip Preflight."
+  "You are the executor agent for this Agent Friction Lab run. Read ./agent-runbook.md and ./experiment-brief.local.md in this directory and follow them exactly, starting with Preflight. Do not skip Preflight. When you have finished (task complete, or you've recorded a STOP per the RETURN protocol), end your final message by telling the human to type /exit (or Ctrl-D) to close this session -- reviewer and mediator run automatically the moment it closes, so don't suggest they run run-friction-lab-experiment.sh manually."
 
 printf '\n===== Running reviewer + mediator =====\n'
 if ! devcontainer exec --workspace-folder . "${remote_env_args[@]}" bash -c "./run-friction-lab-experiment.sh all"; then
