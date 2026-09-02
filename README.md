@@ -6,6 +6,20 @@ Use this when you want to observe what happens when a relatively barebones codin
 
 ## Quickstart
 
+You need Docker and VS Code with the Dev Containers extension installed.
+
+In VS Code:
+
+1. Run **Git: Clone** from the command palette and clone `https://github.com/webchick/agent-friction-lab.git`.
+2. Open the cloned folder in VS Code.
+3. Open a VS Code terminal in that folder and run:
+
+```bash
+cp .friction-lab/config.json .friction-lab/config.local.json
+```
+
+In a regular terminal:
+
 ```bash
 git clone https://github.com/webchick/agent-friction-lab.git
 cd agent-friction-lab
