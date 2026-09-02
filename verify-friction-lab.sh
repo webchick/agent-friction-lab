@@ -255,9 +255,9 @@ if [ "$mcp_provider" = "claude" ]; then
         fail "Claude Code does not list expected MCP server: $expected_name"
       fi
     done
-    mcp_names="$(printf '%s\n' "$claude_mcp_list" | sed -nE 's/^([[:alnum:]_.@/-]+):.*/\1/p' | sort -u)"
+    mapfile -t mcp_names_arr < <(printf '%s\n' "$claude_mcp_list" | sed -nE 's/^([^:]+):.*/\1/p' | sort -u)
     unexpected_mcp=""
-    for name in $mcp_names; do
+    for name in "${mcp_names_arr[@]}"; do
       case " $allowed_mcp_servers " in
         *" $name "*) ;;
         *) unexpected_mcp="${unexpected_mcp}${name}"$'\n' ;;

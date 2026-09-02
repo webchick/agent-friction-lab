@@ -65,9 +65,9 @@ fi
 mkdir -p /home/node/.claude
 
 configured_names="$(jq -r '.mcpServers[]?.name' "$config_path")"
-existing_names="$(claude mcp list 2>/dev/null | sed -nE 's/^([[:alnum:]_.@/-]+):.*/\1/p' || true)"
+mapfile -t existing_names_arr < <(claude mcp list 2>/dev/null | sed -nE 's/^([^:]+):.*/\1/p')
 
-for name in $existing_names; do
+for name in "${existing_names_arr[@]}"; do
   if ! printf '%s\n' "$configured_names" | grep -Fxq "$name"; then
     claude mcp remove --scope user "$name" >/dev/null 2>&1 || true
   fi
