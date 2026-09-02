@@ -34,9 +34,31 @@ allowed_mcp_servers="${FRICTION_LAB_ALLOWED_MCP_SERVERS:-$(read_json_array_words
 forbidden_commands="${FRICTION_LAB_FORBIDDEN_COMMANDS:-$(read_json_array_words '.forbiddenCommands // []')}"
 forbidden_env_pattern="${FRICTION_LAB_FORBIDDEN_ENV_PATTERN:-$(jq -r '.forbiddenEnvPattern // ""' "$config_path")}"
 prior_trace_pattern="${FRICTION_LAB_PRIOR_TRACE_PATTERN:-$(jq -r '.priorTracePattern // ""' "$config_path")}"
-agent_name="$(jq -r '.agent.name // "unspecified"' "$config_path")"
-agent_command="$(jq -r '.agent.command // ""' "$config_path")"
-mcp_provider="$(jq -r '.agent.mcpProvider // "none"' "$config_path")"
+agent_summary="$(jq -r '
+  if (.agents // []) | length > 0 then
+    [.agents[] | "\(.id // .role // "agent")=\(.name // "unspecified")/\(.role // "unspecified")"] | join(", ")
+  elif .agent then
+    "agent=\(.agent.name // "unspecified")"
+  else
+    "none"
+  end
+' "$config_path")"
+agent_commands="$(jq -r '
+  if (.agents // []) | length > 0 then
+    .agents[]? | select((.command // "") != "" and (if has("required") then .required else true end) != false) | .command
+  elif .agent and ((.agent.command // "") != "") then
+    .agent.command
+  else
+    empty
+  end
+' "$config_path")"
+mcp_provider="$(jq -r '
+  if (.agents // []) | length > 0 then
+    ([.agents[]?.mcpProvider // "none" | select(. != "none")] | first) // "none"
+  else
+    .agent.mcpProvider // "none"
+  end
+' "$config_path")"
 
 pass() {
   printf 'PASS: %s\n' "$1"
@@ -93,7 +115,7 @@ printf 'OS: %s\n' "$(uname -a)"
 printf 'CWD: %s\n' "$PWD"
 printf 'HOME: %s\n' "$HOME"
 printf 'Config: %s\n' "$config_path"
-printf 'Agent: %s\n' "$agent_name"
+printf 'Agents: %s\n' "$agent_summary"
 printf '\n'
 
 if [ -r /etc/debian_version ]; then
@@ -123,13 +145,15 @@ else
   fail "npm does not run"
 fi
 
-if [ -n "$agent_command" ]; then
-  if command -v "$agent_command" >/dev/null 2>&1; then
-    version_output="$("$agent_command" --version 2>/dev/null | head -n 1 || true)"
-    pass "configured agent command runs: $agent_command${version_output:+ ($version_output)}"
-  else
-    fail "configured agent command is missing: $agent_command"
-  fi
+if [ -n "$agent_commands" ]; then
+  for agent_command in $agent_commands; do
+    if command -v "$agent_command" >/dev/null 2>&1; then
+      version_output="$("$agent_command" --version 2>/dev/null | head -n 1 || true)"
+      pass "configured agent command runs: $agent_command${version_output:+ ($version_output)}"
+    else
+      fail "configured agent command is missing: $agent_command"
+    fi
+  done
 else
   pass "no configured agent command"
 fi
@@ -254,7 +278,7 @@ if [ "$mcp_provider" = "claude" ]; then
   fi
 else
   if [ -n "$allowed_mcp_servers" ]; then
-    fail "allowedMcpServers is set, but agent.mcpProvider is $mcp_provider"
+    fail "allowedMcpServers is set, but no compatible agent MCP provider is configured (provider=$mcp_provider)"
   else
     pass "no MCP provider configured"
   fi

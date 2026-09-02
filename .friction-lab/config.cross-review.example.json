@@ -14,11 +14,28 @@
       "name": "Claude Code",
       "command": "claude",
       "mcpProvider": "claude"
+    },
+    {
+      "id": "reviewer",
+      "role": "reviewer",
+      "name": "Codex",
+      "command": "",
+      "mcpProvider": "none",
+      "required": false,
+      "notes": "External reviewer/lab-tech agent; not installed or configured inside the container by this profile."
     }
   ],
   "reviewProtocol": {
-    "mode": "single-agent",
-    "description": "One configured agent executes the experiment and records evidence."
+    "mode": "cross-review",
+    "description": "The executor produces evidence and findings. The reviewer examines the evidence, challenges conclusions, and decides whether to return to the executor or escalate to the human.",
+    "handoffArtifacts": [
+      "environment.md",
+      "raw-log.md",
+      "evidence-index.md",
+      "findings.md",
+      "evidence/",
+      "artifacts/"
+    ]
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",

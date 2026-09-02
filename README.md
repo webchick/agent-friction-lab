@@ -127,10 +127,18 @@ The verifier is intentionally generic. For each experiment, edit `.friction-lab/
 ```json
 {
   "requiredCommands": ["node", "npm", "git", "curl", "jq", "claude"],
-  "agent": {
-    "name": "Claude Code",
-    "command": "claude",
-    "mcpProvider": "claude"
+  "agents": [
+    {
+      "id": "executor",
+      "role": "executor",
+      "name": "Claude Code",
+      "command": "claude",
+      "mcpProvider": "claude"
+    }
+  ],
+  "reviewProtocol": {
+    "mode": "single-agent",
+    "description": "One configured agent executes the experiment and records evidence."
   },
   "forbiddenCommands": ["example-cli"],
   "forbiddenEnvPattern": "EXAMPLE_VENDOR|ANOTHER_VENDOR",
@@ -161,9 +169,23 @@ FRICTION_LAB_ALLOWED_MCP_SERVERS="playwright"
 
 `.friction-lab/env` and `.friction-lab/config.local.json` are ignored by Git so local experiment details do not accidentally get committed to the public harness repo.
 
-The default config enables Claude Code plus Playwright MCP because browser automation is a common experiment need. Remove or replace the agent, package, browser, MCP, and allowed-server entries for a different agent or a shell-only friction lab.
+The default config enables Claude Code plus Playwright MCP because browser automation is a common experiment need. Remove or replace the agents, package, browser, MCP, and allowed-server entries for a different agent or a shell-only friction lab.
 
-Examples are available at `.friction-lab/config.claude-playwright.example.json` and `.friction-lab/config.shell-only.example.json`.
+Examples are available at `.friction-lab/config.claude-playwright.example.json`, `.friction-lab/config.cross-review.example.json`, and `.friction-lab/config.shell-only.example.json`.
+
+## Agent Roles And Review
+
+Use `agents` to declare the roles participating in the experiment. Common roles are:
+
+- `executor`: the agent that attempts the task.
+- `reviewer`: an agent or human-in-the-loop helper that examines evidence and challenges conclusions.
+- `observer`: a non-executing role that records or summarizes behavior.
+
+Use `reviewProtocol` to describe the expected handoff pattern. For example, a cross-review run might use Claude Code as the executor inside the container, then pass `environment.md`, `raw-log.md`, `evidence-index.md`, `findings.md`, `evidence/`, and `artifacts/` to an external Codex reviewer before escalating to a human.
+
+Reviewer agents do not have to run inside the same container. Keeping the reviewer external can reduce cross-contamination because the executor's container remains the measured environment, while the reviewer inspects only the recorded evidence. If an experiment intentionally needs two agents in the same container, declare both as required installed agents and document that shared environment as part of the baseline.
+
+This is related to multi-agent debate, adversarial collaboration, and cross-examination patterns. The goal is not to make agents argue theatrically; it is to make claims easier to verify before a human has to make a decision.
 
 ## Baseline Bias
 

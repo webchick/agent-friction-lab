@@ -6,10 +6,10 @@
     "curl",
     "jq"
   ],
-  "agent": {
-    "name": "none",
-    "command": "",
-    "mcpProvider": "none"
+  "agents": [],
+  "reviewProtocol": {
+    "mode": "none",
+    "description": "No agent command or MCP provider is configured."
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",

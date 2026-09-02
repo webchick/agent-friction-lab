@@ -43,10 +43,16 @@ if [ "${#playwright_mcp_browsers[@]}" -gt 0 ]; then
   sudo chmod -R a+rX "${PLAYWRIGHT_BROWSERS_PATH:-/ms-playwright}"
 fi
 
-mcp_provider="$(jq -r '.agent.mcpProvider // "none"' "$config_path")"
+mcp_provider="$(jq -r '
+  if (.agents // []) | length > 0 then
+    ([.agents[]?.mcpProvider // "none" | select(. != "none")] | first) // "none"
+  else
+    .agent.mcpProvider // "none"
+  end
+' "$config_path")"
 
 if [ "$mcp_provider" != "claude" ]; then
-  printf 'No Claude MCP setup requested (agent.mcpProvider=%s).\n' "$mcp_provider"
+  printf 'No Claude MCP setup requested (configured MCP provider=%s).\n' "$mcp_provider"
   printf 'Agent Friction Lab setup complete from %s\n' "$config_path"
   exit 0
 fi

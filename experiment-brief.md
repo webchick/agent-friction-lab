@@ -77,10 +77,18 @@ Suggested config fields:
 ```json
 {
   "requiredCommands": ["node", "npm", "git", "curl", "jq", "claude"],
-  "agent": {
-    "name": "Claude Code",
-    "command": "claude",
-    "mcpProvider": "claude"
+  "agents": [
+    {
+      "id": "executor",
+      "role": "executor",
+      "name": "Claude Code",
+      "command": "claude",
+      "mcpProvider": "claude"
+    }
+  ],
+  "reviewProtocol": {
+    "mode": "single-agent",
+    "description": "One configured agent executes the experiment and records evidence."
   },
   "forbiddenCommands": [],
   "forbiddenEnvPattern": "",

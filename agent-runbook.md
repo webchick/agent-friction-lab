@@ -114,6 +114,30 @@ Starting from the verified friction lab environment:
 
 Do not describe friction from one chosen route as inherent to the target unless evidence supports that attribution.
 
+## Cross-Review
+
+If the experiment config declares a cross-review or multi-agent review protocol, preserve the handoff artifacts before asking the reviewer to evaluate the run.
+
+Reviewer agents may be external to the executor container. This preserves the executor container as the measured environment and limits the reviewer to the evidence record. If multiple agents intentionally run inside the same container, record that shared environment in `environment.md`.
+
+The executor should provide:
+
+- `environment.md`,
+- `raw-log.md`,
+- `evidence-index.md`,
+- `findings.md`,
+- relevant files under `evidence/` and `artifacts/`.
+
+The reviewer should:
+
+- verify that findings are supported by evidence IDs,
+- distinguish observed facts from inferences and recommendations,
+- challenge claims that rely on missing or weak evidence,
+- identify places where a different reasonable path might have changed the outcome,
+- return specific follow-up questions or escalation points rather than silently rewriting the executor's conclusions.
+
+Use the review as a cross-examination step before human escalation, not as an automatic override.
+
 ## Boundaries
 
 Follow the task-specific brief. Unless explicitly allowed there, do not:
