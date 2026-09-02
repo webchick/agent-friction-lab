@@ -23,13 +23,19 @@ Then start the disposable test environment:
 devcontainer up --workspace-folder . --remove-existing-container
 ```
 
-Open a shell in the container and run:
+Open a shell in the container:
+
+```bash
+devcontainer exec --workspace-folder . bash
+```
+
+From inside that shell, run:
 
 ```bash
 ./verify-friction-lab.sh
 ```
 
-Start the agent experiment only after verification passes.
+Start the agent experiment only after verification passes. That same `devcontainer exec` shell is also where you drive the executor interactively and run `run-friction-lab-experiment.sh` — reopen it any time with the command above.
 
 ### Prefer VS Code?
 
@@ -105,11 +111,7 @@ devcontainer build --workspace-folder . --no-cache
 devcontainer up --workspace-folder . --remove-existing-container
 ```
 
-Then open a shell in the container and run:
-
-```bash
-./verify-friction-lab.sh
-```
+Then open a shell (`devcontainer exec --workspace-folder . bash`, as in Quickstart above) and run `./verify-friction-lab.sh`.
 
 ## Config Format
 
